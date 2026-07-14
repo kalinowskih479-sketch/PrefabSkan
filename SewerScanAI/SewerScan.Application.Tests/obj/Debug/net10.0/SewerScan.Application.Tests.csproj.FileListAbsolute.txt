@@ -101,3 +101,4 @@ C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.Application.Tests\obj\Debug\net10
 C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.Application.Tests\obj\Debug\net10.0\SewerScan.Application.Tests.pdb
 C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.Application.Tests\obj\Debug\net10.0\SewerScan.Application.Tests.genruntimeconfig.cache
 C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.Application.Tests\obj\Debug\net10.0\ref\SewerScan.Application.Tests.dll
+C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.Application.Tests\obj\Debug\net10.0\SewerScan.Application.Tests.sourcelink.json

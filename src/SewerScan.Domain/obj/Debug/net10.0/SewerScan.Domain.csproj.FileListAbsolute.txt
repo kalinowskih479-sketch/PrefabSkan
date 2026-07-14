@@ -9,3 +9,4 @@ C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\SewerScan.Domain
 C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\refint\SewerScan.Domain.dll
 C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\SewerScan.Domain.pdb
 C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\ref\SewerScan.Domain.dll
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\SewerScan.Domain.sourcelink.json

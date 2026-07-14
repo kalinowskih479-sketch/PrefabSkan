@@ -19,6 +19,7 @@ namespace SewerScan.UI
         public MainWindow()
         {
             InitializeComponent();
+            // Keep constructor minimal to remain compatible with DI and unit testing.
         }
     }
 }

@@ -13,3 +13,4 @@ C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerScan.A
 C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\refint\SewerScan.Application.dll
 C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerScan.Application.pdb
 C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\ref\SewerScan.Application.dll
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerScan.Application.sourcelink.json
