@@ -1153,6 +1153,10 @@
             "Microsoft.EntityFrameworkCore.Sqlite": {
               "target": "Package",
               "version": "[8.0.0, )"
+            },
+            "UglyToad.PdfPig": {
+              "target": "Package",
+              "version": "[0.1.9-alpha001-patch1, )"
             }
           },
           "imports": [

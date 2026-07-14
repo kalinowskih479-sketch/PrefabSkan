@@ -13,5 +13,6 @@
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
 	  <PrivateAssets>all</PrivateAssets>
 	</PackageReference>
+	<PackageReference Include="UglyToad.PdfPig" Version="0.1.9-alpha001-patch1" />
   </ItemGroup>
 </Project>

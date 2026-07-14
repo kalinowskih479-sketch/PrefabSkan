@@ -95,3 +95,8 @@ C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.UI\bin\Debug\net10.0-windows\runt
 C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.UI\bin\Debug\net10.0-windows\runtimes\win-arm64\native\e_sqlite3.dll
 C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.UI\bin\Debug\net10.0-windows\runtimes\win-x64\native\e_sqlite3.dll
 C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.UI\bin\Debug\net10.0-windows\runtimes\win-x86\native\e_sqlite3.dll
+C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.UI\bin\Debug\net10.0-windows\UglyToad.PdfPig.dll
+C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.UI\bin\Debug\net10.0-windows\UglyToad.PdfPig.Core.dll
+C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.UI\bin\Debug\net10.0-windows\UglyToad.PdfPig.Fonts.dll
+C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.UI\bin\Debug\net10.0-windows\UglyToad.PdfPig.Tokenization.dll
+C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.UI\bin\Debug\net10.0-windows\UglyToad.PdfPig.Tokens.dll
