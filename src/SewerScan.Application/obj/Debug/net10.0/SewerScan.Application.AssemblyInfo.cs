@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SewerScan.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b7aeb115b81d6ca6f3acc03947819b35c76ae379")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4757b95f9c26adba9ea1552dc63116f06533cc9d")]
 [assembly: System.Reflection.AssemblyProductAttribute("SewerScan.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SewerScan.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

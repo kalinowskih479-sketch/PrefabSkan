@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         // Register other infrastructure services (repositories, OCR, AI, logging adapters etc.)
         // PDF analysis
         services.AddSingleton<ITextExtractor, PdfTextExtractor>();
-        services.AddSingleton<IProjectParser, SimpleProjectParser>();
+        services.AddSingleton<IProjectParser, SewerProjectParser>();
         // Application service - PdfAnalyzer is in Application assembly
         services.AddSingleton<IPdfAnalyzer, PdfAnalyzer>();
 
