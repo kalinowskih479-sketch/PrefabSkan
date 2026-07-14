@@ -1,0 +1,15 @@
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\bin\Debug\net10.0\SewerScan.Application.deps.json
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\bin\Debug\net10.0\SewerScan.Application.dll
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\bin\Debug\net10.0\SewerScan.Application.pdb
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\bin\Debug\net10.0\SewerScan.Domain.dll
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\bin\Debug\net10.0\SewerScan.Domain.pdb
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerScan.Application.csproj.AssemblyReference.cache
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerScan.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerScan.Application.AssemblyInfoInputs.cache
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerScan.Application.AssemblyInfo.cs
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerScan.Application.csproj.CoreCompileInputs.cache
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerSca.9D4618F1.Up2Date
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerScan.Application.dll
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\refint\SewerScan.Application.dll
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\SewerScan.Application.pdb
+C:\Projekty\SerwerScanAI\src\SewerScan.Application\obj\Debug\net10.0\ref\SewerScan.Application.dll

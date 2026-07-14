@@ -1,0 +1,11 @@
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\bin\Debug\net10.0\SewerScan.Domain.deps.json
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\bin\Debug\net10.0\SewerScan.Domain.dll
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\bin\Debug\net10.0\SewerScan.Domain.pdb
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\SewerScan.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\SewerScan.Domain.AssemblyInfoInputs.cache
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\SewerScan.Domain.AssemblyInfo.cs
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\SewerScan.Domain.csproj.CoreCompileInputs.cache
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\SewerScan.Domain.dll
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\refint\SewerScan.Domain.dll
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\SewerScan.Domain.pdb
+C:\Projekty\SerwerScanAI\src\SewerScan.Domain\obj\Debug\net10.0\ref\SewerScan.Domain.dll

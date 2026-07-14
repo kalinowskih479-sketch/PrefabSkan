@@ -1,0 +1,87 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "SewerScan.UI/1.0.0": {
+        "dependencies": {
+          "SewerScan.Application": "1.0.0",
+          "SewerScan.Infrastructure": "1.0.0",
+          "SewerScan.Shared": "1.0.0"
+        },
+        "runtime": {
+          "SewerScan.UI.dll": {}
+        }
+      },
+      "SewerScan.Application/1.0.0": {
+        "dependencies": {
+          "SewerScan.Domain": "1.0.0"
+        },
+        "runtime": {
+          "SewerScan.Application.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "SewerScan.Domain/1.0.0": {
+        "runtime": {
+          "SewerScan.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "SewerScan.Infrastructure/1.0.0": {
+        "dependencies": {
+          "SewerScan.Application": "1.0.0",
+          "SewerScan.Domain": "1.0.0"
+        },
+        "runtime": {
+          "SewerScan.Infrastructure.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "SewerScan.Shared/1.0.0": {
+        "runtime": {
+          "SewerScan.Shared.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SewerScan.UI/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SewerScan.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SewerScan.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SewerScan.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SewerScan.Shared/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

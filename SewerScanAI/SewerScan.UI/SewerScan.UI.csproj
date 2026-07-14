@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SewerScan.Application\SewerScan.Application.csproj" />
+    <ProjectReference Include="..\SewerScan.Infrastructure\SewerScan.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\SewerScan.Shared\SewerScan.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
