@@ -15,3 +15,4 @@ C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.Infrastructure\obj\Debug\net10.0\
 C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.Infrastructure\obj\Debug\net10.0\refint\SewerScan.Infrastructure.dll
 C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.Infrastructure\obj\Debug\net10.0\SewerScan.Infrastructure.pdb
 C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.Infrastructure\obj\Debug\net10.0\ref\SewerScan.Infrastructure.dll
+C:\Projekty\SerwerScanAI\SewerScanAI\SewerScan.Infrastructure\obj\Debug\net10.0\SewerScan.Infrastructure.sourcelink.json

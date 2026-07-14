@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="../src/SewerScan.Application/SewerScan.Application.csproj" />
+  <Project Path="../src/SewerScan.Domain/SewerScan.Domain.csproj" />
+  <Project Path="../src/SewerScan.Shared/SewerScan.Shared.csproj" />
+  <Project Path="SewerScan.Application.Tests/SewerScan.Application.Tests.csproj" />
+  <Project Path="SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj" />
+  <Project Path="SewerScan.Infrastructure/SewerScan.Infrastructure.csproj" />
+  <Project Path="SewerScan.UI/SewerScan.UI.csproj" />
+</Solution>

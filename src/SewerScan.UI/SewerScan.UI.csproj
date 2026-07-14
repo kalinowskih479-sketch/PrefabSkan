@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+	<TargetFramework>net10.0</TargetFramework>
+	<UseWPF>true</UseWPF>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+	<ProjectReference Include="..\SewerScan.Application\SewerScan.Application.csproj" />
+	<ProjectReference Include="..\SewerScan.Infrastructure\SewerScan.Infrastructure.csproj" />
+	<ProjectReference Include="..\SewerScan.Shared\SewerScan.Shared.csproj" />
+  </ItemGroup>
+</Project>
