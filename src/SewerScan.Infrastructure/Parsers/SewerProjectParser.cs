@@ -331,7 +331,7 @@ namespace SewerScan.Infrastructure.Parsers
             var anchors = FindSpatialManholeAnchors(usable, result.DrawingType);
 
             if (string.Equals(result.DrawingType, "PROFIL", StringComparison.OrdinalIgnoreCase))
-                anchors = SelectProfileTableAnchors(anchors, usable, debug);
+                anchors = SelectProfileTableAnchors(anchors, usable, page.Text ?? string.Empty, debug);
             else
                 anchors = anchors
                     .GroupBy(a => a.Identifier, StringComparer.OrdinalIgnoreCase)
@@ -458,6 +458,7 @@ namespace SewerScan.Infrastructure.Parsers
         private static List<SpatialManholeAnchor> SelectProfileTableAnchors(
             IReadOnlyList<SpatialManholeAnchor> candidates,
             IReadOnlyList<TextItem> items,
+            string pageText,
             StringBuilder debug)
         {
             if (candidates.Count == 0)
@@ -485,6 +486,15 @@ namespace SewerScan.Infrastructure.Parsers
                 }
                 band.Add(anchor);
             }
+
+            // 4.2.4: use the network family as engineering evidence too. On Polish sewer
+            // drawings the deszczowa profile is normally D/KD and sanitarna is S/KS.
+            // OCR may still hallucinate a numerically stronger band from the opposite network.
+            var preferredFamily = Regex.IsMatch(pageText ?? string.Empty, @"KANALIZACJI\s+DESZCZ|DESZCZOW", RegexOptions.IgnoreCase)
+                ? "D"
+                : Regex.IsMatch(pageText ?? string.Empty, @"KANALIZACJI\s+SANITAR|SANITARN", RegexOptions.IgnoreCase)
+                    ? "S"
+                    : string.Empty;
 
             // 4.2.3: the densest OCR band is not necessarily the profile node row.
             // Batorego produced a denser garbage band (S79, S13, S06/09, S61.16...)
@@ -525,8 +535,19 @@ namespace SewerScan.Infrastructure.Parsers
                         if (n.Success && int.TryParse(n.Groups["n"].Value, out var number) && number >= 30) syntaxPenalty += 5;
                     }
 
-                    var score = engineeringColumns * 24.0 + dnColumns * 14.0 + distinct * 2.0 - syntaxPenalty;
-                    return new { Band = b, Distinct = distinct, Width = width, EngineeringColumns = engineeringColumns, DnColumns = dnColumns, Score = score };
+                    var uniqueAnchors = b.GroupBy(x => x.Identifier, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList();
+                    var familyMatches = string.IsNullOrWhiteSpace(preferredFamily)
+                        ? 0
+                        : uniqueAnchors.Count(a => preferredFamily == "D"
+                            ? Regex.IsMatch(a.Identifier, @"^(?:D|KD)\d", RegexOptions.IgnoreCase)
+                            : Regex.IsMatch(a.Identifier, @"^(?:S|KS)\d", RegexOptions.IgnoreCase));
+                    var familyMismatches = string.IsNullOrWhiteSpace(preferredFamily)
+                        ? 0
+                        : uniqueAnchors.Count - familyMatches;
+
+                    var score = engineeringColumns * 24.0 + dnColumns * 14.0 + distinct * 2.0 - syntaxPenalty
+                                + familyMatches * 28.0 - familyMismatches * 18.0;
+                    return new { Band = b, Distinct = distinct, Width = width, EngineeringColumns = engineeringColumns, DnColumns = dnColumns, FamilyMatches = familyMatches, FamilyMismatches = familyMismatches, Score = score };
                 })
                 .OrderByDescending(x => x.Score)
                 .ThenByDescending(x => x.EngineeringColumns)
@@ -535,7 +556,7 @@ namespace SewerScan.Infrastructure.Parsers
                 .ThenByDescending(x => x.Width)
                 .First();
 
-            debug.AppendLine($"4.2.3 profile node-band score: score={best.Score:0.0}, engineering={best.EngineeringColumns}, dn={best.DnColumns}, ids={best.Distinct}.");
+            debug.AppendLine($"4.2.4 profile node-band score: score={best.Score:0.0}, family={preferredFamily}, familyMatch={best.FamilyMatches}, familyMismatch={best.FamilyMismatches}, engineering={best.EngineeringColumns}, dn={best.DnColumns}, ids={best.Distinct}.");
 
             var selected = best.Band
                 .GroupBy(a => a.Identifier, StringComparer.OrdinalIgnoreCase)
