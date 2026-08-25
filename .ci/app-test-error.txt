@@ -1,155 +1,154 @@
 PrefabScan 4.2.2 application-test diagnostics
 exit_code=1
-commit=8d7baef4f512496c4a2cf919f5989c02d547e547
+commit=ba3bfdbf8b1ce517474f4a9cceffe86b4a5a196f
 --- errors/failures ---
-704:[xUnit.net 00:00:00.53]       Stack Trace:
-710:[xUnit.net 00:00:00.54]       Stack Trace:
-717:  Failed SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise [29 ms]
-718:  Error Message:
-722:  Stack Trace:
-726:  Failed SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition [13 ms]
-727:  Error Message:
-730:  Stack Trace:
-745:[xUnit.net 00:00:00.58]       Stack Trace:
-756:[xUnit.net 00:00:00.58]       Stack Trace:
-761:  Failed SewerScan.Application.Tests.PrefabScan09RegressionTests.Pzt_Normalizes_Duplicated_Cad_Glyphs_For_D6Slash1_And_D7 [8 ms]
-762:  Error Message:
-766:  Stack Trace:
-770:  Failed SewerScan.Application.Tests.PrefabScan07RegressionTests.Pzt_Reconstructs_Split_D6Slash1_And_Keeps_Its_Own_Elevations [17 ms]
-771:  Error Message:
-775:  Stack Trace:
-785:[xUnit.net 00:00:00.58]       Stack Trace:
-792:[xUnit.net 00:00:00.58]       Stack Trace:
-800:[xUnit.net 00:00:00.59]       Stack Trace:
-805:  Failed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Does_Not_Create_TextOnly_D60_Noise_Without_Elevations [4 ms]
-806:  Error Message:
-810:  Stack Trace:
-813:  Failed SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions [2 ms]
-814:  Error Message:
-818:  Stack Trace:
-823:  Failed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context [10 ms]
-824:  Error Message:
-827:  Stack Trace:
-833:Test Run Failed.
-842:Build FAILED.
+356:[xUnit.net 00:00:00.39]       Stack Trace:
+363:[xUnit.net 00:00:00.39]       Stack Trace:
+370:  Failed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Does_Not_Create_TextOnly_D60_Noise_Without_Elevations [78 ms]
+371:  Error Message:
+375:  Stack Trace:
+379:  Failed SewerScan.Application.Tests.PrefabScan09RegressionTests.Pzt_Normalizes_Duplicated_Cad_Glyphs_For_D6Slash1_And_D7 [168 ms]
+380:  Error Message:
+384:  Stack Trace:
+391:[xUnit.net 00:00:00.40]       Stack Trace:
+395:  Failed SewerScan.Application.Tests.PrefabScan07RegressionTests.Pzt_Reconstructs_Split_D6Slash1_And_Keeps_Its_Own_Elevations [10 ms]
+396:  Error Message:
+400:  Stack Trace:
+412:[xUnit.net 00:00:00.43]       Stack Trace:
+418:[xUnit.net 00:00:00.43]       Stack Trace:
+424:[xUnit.net 00:00:00.43]       Stack Trace:
+429:  Failed SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise [4 ms]
+430:  Error Message:
+434:  Stack Trace:
+437:  Failed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context [53 ms]
+438:  Error Message:
+441:  Stack Trace:
+444:  Failed SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition [4 ms]
+445:  Error Message:
+448:  Stack Trace:
+463:[xUnit.net 00:00:00.46]       Stack Trace:
+473:  Failed SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions [2 ms]
+474:  Error Message:
+478:  Stack Trace:
+483:Test Run Failed.
 --- final 120 lines ---
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-cqw9-w2m7-r2m2
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-cr67-pvmx-2pp2
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-cr6r-hmj8-pr7r
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-cwpj-h54c-xjpx
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-f4qm-vj5j-9xpw
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-f5m7-cqgw-8hm7
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-ff5c-8x9r-8qcw
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-fh55-q5pj-pxgw
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-fpvf-frm6-625q
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-fwqw-2x5x-w566
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-fwvm-ggf6-2p4x
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-g22q-f7gc-5jhr
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g2pr-qxjg-7r2w
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-g5mf-wqq5-vwg6
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-gc62-2v5p-qpmp
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-gm37-qx7w-p258
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-gq5v-qf8q-fp77
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-gwr3-x37h-h84v
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-gxcx-qjqp-8vjw
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-h22j-f9xw-xjjm
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-h36c-3666-h489
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-h58x-r7f7-rh84
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-h5r4-w88w-7ccr
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-h7f2-f9cc-h2gv
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-h95r-c8c7-mrwx
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-hc76-7mpc-qjqh
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-hffp-q43q-qq76
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-hm4x-r5hc-794f
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-hwf3-r46v-5ggx
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-j8rh-v2r8-v94x
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-j989-f892-2335
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-jcqp-6r6f-3mfx
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-jfq9-q63x-rc63
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-jqq5-8px3-9m6m
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-jv4p-gjwq-9r2j
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-jvgr-9ph5-m8v4
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-m596-67p7-69wh
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-mqfc-82jx-3mr2
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-mrmj-x24c-wwcv
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-mw3m-pqr2-qv7c
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-mx48-2qq3-23hf
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mxvv-97wh-cfmm
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-p27m-hp98-6637
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-p33r-fqw2-rqmm
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-p863-5fgm-rgq4
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-p93h-f2jc-477j
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-p9rq-q46c-g4x6
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-pcvx-ph33-r5vv
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-pfvh-m9xv-8966
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-pjxj-pchx-4c3m
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-pmpg-6pww-fg6q
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-pmq6-8289-hx3v
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-pqgj-2p96-rx85
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-pwg5-6jfc-crvh
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-px7q-ggqj-hcf2
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-q62c-h75r-2xhc
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-q8h3-jv9v-57qx
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qh3h-j545-h8c9
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-qh5g-q395-cx4j
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qhmf-7fc4-8q3h
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qmw5-2p58-xvrc
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qp29-wxp5-wh82
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qp59-x883-77qv
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qpg4-j99f-8xcg
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-qpgx-jfcq-r59f
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-qv2q-c278-pch5
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-qvxh-prvr-85w2
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-r39q-jr8h-gcq2
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-r628-69v2-2f9c
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-r83h-crwp-3vm7
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-r99p-5442-q2x2
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-rcr6-g7jc-f57g
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-rqq8-jh93-f4vg
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-rvhp-75f6-9jqh
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-rw6c-xp26-225v
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-v3j6-27vc-7pw2
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-v67w-737x-v2c9
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-v7g2-m8c5-mf84
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-v994-63cg-9wj3
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-vf33-6r7x-66xx
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-vghg-5jrg-2398
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-vhqj-f5cj-9x8h
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-vhrh-72hq-w8m7
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-vmhh-8rxq-fp9g
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-vpxv-r9pg-7gpr
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-w54j-7wpm-crhj
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-w8mw-frc6-r7m8
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-wfx3-6g53-9fgc
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-wg3g-gvx5-2pmv
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-wgxp-q8xq-wpp9
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-wj8w-pjxf-9g4f
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-wrhr-rf8j-r842
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-x928-4434-crqj
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9h5-r9v2-vcww
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-xcjm-wqff-m669
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-xg29-8ghv-v4xr
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-xgm3-v4r9-wfgm
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1901: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known low severity vulnerability, https://github.com/advisories/GHSA-xpg8-7m6m-jf56
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-xwc6-v6g8-pw2h
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1902: Package 'Magick.NET-Q8-AnyCPU' 13.3.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-xxw5-m53x-j38c
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'Microsoft.Extensions.Caching.Memory' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-qj66-m88j-hmgj
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj : warning NU1903: Package 'SQLitePCLRaw.lib.e_sqlite3' 2.1.6 has a known high severity vulnerability, https://github.com/advisories/GHSA-2m69-gcr7-jv3q
+  Passed SewerScan.Application.Tests.ProjectMergerTests.Merge_ComplementsPztWithProfileData_ByIdentifier [1 ms]
+  Passed SewerScan.Application.Tests.PrefabScan08RegressionTests.Text_Fallback_Preserves_Wp_Prefix [87 ms]
+  Failed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Does_Not_Create_TextOnly_D60_Noise_Without_Elevations [78 ms]
+  Error Message:
+   Assert.DoesNotContain() Failure: Filter matched in collection
+             ↓ (pos 0)
+Collection: [ParsedManhole { CompletenessPercent = 0, Confidence = "niska", Crown = null, DiameterMm = null, GroundElevationM = null, ··· }, ParsedManhole { CompletenessPercent = 0, Confidence = "niska", Crown = null, DiameterMm = null, GroundElevationM = null, ··· }]
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Does_Not_Create_TextOnly_D60_Noise_Without_Elevations() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 431
+--- End of stack trace from previous location ---
+  Passed SewerScan.Application.Tests.PrefabScan08RegressionTests.Item_Stream_Recovers_Split_D20_D21_D22 [40 ms]
+  Failed SewerScan.Application.Tests.PrefabScan09RegressionTests.Pzt_Normalizes_Duplicated_Cad_Glyphs_For_D6Slash1_And_D7 [168 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 7.0800000000000001
+Actual:   7.1399999999999997
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan09RegressionTests.Pzt_Normalizes_Duplicated_Cad_Glyphs_For_D6Slash1_And_D7() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 358
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:00.40]     SewerScan.Application.Tests.PrefabScan07RegressionTests.Pzt_Reconstructs_Split_D6Slash1_And_Keeps_Its_Own_Elevations [FAIL]
+[xUnit.net 00:00:00.40]       Assert.Equal() Failure: Values differ
+[xUnit.net 00:00:00.40]       Expected: 134.15000000000001
+[xUnit.net 00:00:00.40]       Actual:   133.55000000000001
+[xUnit.net 00:00:00.40]       Stack Trace:
+[xUnit.net 00:00:00.40]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(249,0): at SewerScan.Application.Tests.PrefabScan07RegressionTests.Pzt_Reconstructs_Split_D6Slash1_And_Keeps_Its_Own_Elevations()
+[xUnit.net 00:00:00.40]         --- End of stack trace from previous location ---
+  Passed SewerScan.Application.Tests.PrefabScan37ArchitectureTests.Explicit_Pzt_Hint_Wins_Over_Profile_Words [7 ms]
+  Failed SewerScan.Application.Tests.PrefabScan07RegressionTests.Pzt_Reconstructs_Split_D6Slash1_And_Keeps_Its_Own_Elevations [10 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 134.15000000000001
+Actual:   133.55000000000001
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan07RegressionTests.Pzt_Reconstructs_Split_D6Slash1_And_Keeps_Its_Own_Elevations() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 249
+--- End of stack trace from previous location ---
+  Passed SewerScan.Application.Tests.PrefabScan07RegressionTests.Pzt_Reconstructs_Split_D16_Identifier [3 ms]
+  Passed SewerScan.Application.Tests.ApplicationSanityTests.MarkerInterfaceExists [< 1 ms]
+  Passed SewerScan.Application.Tests.PrefabScan37ArchitectureTests.Profile_Row_Bands_Assign_Elevations_By_Structure_Column [11 ms]
+  Passed SewerScan.Application.Tests.PrefabScan39GeometryFirstTests.Geometry_First_Prefers_Repeated_Profile_Rows_Over_Nearby_Distractors [201 ms]
+  Passed SewerScan.Application.Tests.PrefabScan37ArchitectureTests.Profile_Repeated_Dn_Row_Can_Assign_Standard_Manhole_Diameter [12 ms]
+[xUnit.net 00:00:00.43]     SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise [FAIL]
+[xUnit.net 00:00:00.43]       Assert.DoesNotContain() Failure: Filter matched in collection
+[xUnit.net 00:00:00.43]                                                                                                                                                                    ↓ (pos 1)
+[xUnit.net 00:00:00.43]       Collection: [ParsedManhole { CompletenessPercent = 0, Confidence = "średnia", Crown = null, DiameterMm = null, GroundElevationM = 62.850000000000001, ··· }, ParsedManhole { CompletenessPercent = 0, Confidence = "niska", Crown = null, DiameterMm = null, GroundElevationM = null, ··· }]
+[xUnit.net 00:00:00.43]       Stack Trace:
+[xUnit.net 00:00:00.43]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(475,0): at SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise()
+[xUnit.net 00:00:00.43]         --- End of stack trace from previous location ---
+[xUnit.net 00:00:00.43]     SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context [FAIL]
+[xUnit.net 00:00:00.43]       Assert.Contains() Failure: Filter not matched in collection
+[xUnit.net 00:00:00.43]       Collection: [ManholeTransition { DiameterMm = 160, Material = "PVC", Quantity = 1 }]
+[xUnit.net 00:00:00.43]       Stack Trace:
+[xUnit.net 00:00:00.43]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(454,0): at SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context()
+[xUnit.net 00:00:00.43]         --- End of stack trace from previous location ---
+[xUnit.net 00:00:00.43]     SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition [FAIL]
+[xUnit.net 00:00:00.43]       Assert.Contains() Failure: Filter not matched in collection
+[xUnit.net 00:00:00.43]       Collection: []
+[xUnit.net 00:00:00.43]       Stack Trace:
+[xUnit.net 00:00:00.43]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(495,0): at SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition()
+[xUnit.net 00:00:00.43]         --- End of stack trace from previous location ---
+[Parser] Added manhole token: Page=1 Id=D1 Raw='D 1'
+  Passed SewerScan.Application.Tests.SewerProjectSpatialParserTests.Spatial_Mode_Keeps_Transitions_With_Their_Own_Manhole [22 ms]
+  Failed SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise [4 ms]
+  Error Message:
+   Assert.DoesNotContain() Failure: Filter matched in collection
+                                                                                                                                                             ↓ (pos 1)
+Collection: [ParsedManhole { CompletenessPercent = 0, Confidence = "średnia", Crown = null, DiameterMm = null, GroundElevationM = 62.850000000000001, ··· }, ParsedManhole { CompletenessPercent = 0, Confidence = "niska", Crown = null, DiameterMm = null, GroundElevationM = null, ··· }]
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 475
+--- End of stack trace from previous location ---
+  Failed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context [53 ms]
+  Error Message:
+   Assert.Contains() Failure: Filter not matched in collection
+Collection: [ManholeTransition { DiameterMm = 160, Material = "PVC", Quantity = 1 }]
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 454
+--- End of stack trace from previous location ---
+  Failed SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition [4 ms]
+  Error Message:
+   Assert.Contains() Failure: Filter not matched in collection
+Collection: []
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 495
+--- End of stack trace from previous location ---
+  Passed SewerScan.Application.Tests.PrefabScan39GeometryFirstTests.Geometry_First_Does_Not_Promote_Pipe_Dn_When_Not_Repeated_As_Structure_Row [11 ms]
+  Passed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Pzt_Accepts_TwoDigit_Elevations_And_Computes_Height [9 ms]
+  Passed SewerScan.Application.Tests.SewerProjectSpatialParserTests.Spatial_Mode_Does_Not_Treat_1013_As_Manhole_Diameter [14 ms]
+  Passed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Repairs_ClosingBracket_In_Elevation [2 ms]
+[Parser] Added manhole token: Page=1 Id=D2 Raw='D 2'
+[Parser] Added manhole token: Page=1 Id=KD3 Raw='KD 3'
+[Parser] Added manhole token: Page=1 Id=D5 Raw='D 5'
+[xUnit.net 00:00:00.46]     SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions [FAIL]
+[xUnit.net 00:00:00.46]       Assert.Equal() Failure: Values differ
+[xUnit.net 00:00:00.46]       Expected: 2000
+[Parser] Added manhole token: Page=1 Id=D1 Raw='D 1'
+[xUnit.net 00:00:00.46]       Actual:   null
+[xUnit.net 00:00:00.46]       Stack Trace:
+[xUnit.net 00:00:00.46]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(61,0): at SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions()
+[xUnit.net 00:00:00.46]         --- End of stack trace from previous location ---
+[Parser] Added manhole token: Page=1 Id=D2 Raw='D 2'
+[xUnit.net 00:00:00.46]   Finished:    SewerScan.Application.Tests
+  Passed SewerScan.Application.Tests.PrefabScan06RegressionTests.Pzt_Computes_Height_From_Two_Nearby_Elevations_Without_Guessing_Pipe_Diameter [8 ms]
+  Passed SewerScan.Application.Tests.PrefabScan06RegressionTests.Spatial_Mode_Recognises_Compact_Wp_Identifiers [1 ms]
+  Passed SewerScan.Application.Tests.PrefabScan32VisionHardeningTests.Ocr_High_Number_Without_Engineering_Evidence_Is_Marked_For_Verification [3 ms]
+  Passed SewerScan.Application.Tests.PrefabScan06RegressionTests.Profile_Recognises_Dotted_Identifiers_And_SO_But_Rejects_KsPipeLabels [4 ms]
+  Passed SewerScan.Application.Tests.SewerProjectParserTests.Parses_D_And_KD_Identifiers_Separately [14 ms]
+  Failed SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions [2 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 2000
+Actual:   null
+  Stack Trace:
+     at SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 61
+--- End of stack trace from previous location ---
+  Passed SewerScan.Application.Tests.SewerProjectParserTests.Does_Not_Merge_Different_Manholes_With_The_Same_Diameter [1 ms]
 
-
-       "/home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj" (VSTest target) (1) ->
-       "/home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj" (default target) (1:2) ->
-       "/home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj" (default target) (4:2) ->
-       (CoreCompile target) -> 
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/Parsers/SewerProjectParser.cs(2815,42): warning CS8600: Converting null literal or possible null value to non-nullable type. [/home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj]
-         /home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/Parsers/SewerProjectParser.cs(2818,32): warning CS8600: Converting null literal or possible null value to non-nullable type. [/home/runner/work/PrefabSkan/PrefabSkan/src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj]
-
-
-       "/home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj" (VSTest target) (1) ->
-       "/home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj" (default target) (1:2) ->
-         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(701,47): warning CS8602: Dereference of a possibly null reference. [/home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj]
-
-    333 Warning(s)
-    0 Error(s)
-
-Time Elapsed 00:00:12.69
+Test Run Failed.
+Total tests: 35
+     Passed: 28
+     Failed: 7
+ Total time: 1.0748 Seconds
