@@ -7,6 +7,9 @@ on:
     paths:
       - 'PrefabScan_4.2.2_SOURCE.zip'
       - '.github/workflows/sync-prefabscan-422.yml'
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -55,6 +58,7 @@ jobs:
         run: dotnet test tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj --no-restore --configuration Release --verbosity normal
 
       - name: Commit synchronized source
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         shell: bash
         run: |
           set -euo pipefail
