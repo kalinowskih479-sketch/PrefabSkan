@@ -902,10 +902,7 @@ namespace SewerScan.Infrastructure.Parsers
                 }
 
                 foreach (var a in FindSpatialManholeAnchors(page.Items, result.DrawingType))
-                {
                     identifiers.Add(a.Identifier);
-                    CountIdentifier(a.Identifier);
-                }
             }
 
             var isOcr = (page.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase);
@@ -917,10 +914,12 @@ namespace SewerScan.Infrastructure.Parsers
                 // OCR text streams may turn a diameter/elevation fragment into D60/D00.
                 // Without a spatial anchor, retain an OCR-only identifier only when the same
                 // text sequence also carries a plausible elevation pair.
-                var repeatedOcrId = identifierOccurrences.TryGetValue(id, out var occurrenceCount) && occurrenceCount >= 2;
-                if (isOcr && !directElevations.ContainsKey(id) && !repeatedOcrId)
+                var acceptedSpatialAnchor = spatialAnchors.Any(a =>
+                    string.Equals(a.Identifier, id, StringComparison.OrdinalIgnoreCase));
+                var repeatedTextId = identifierOccurrences.TryGetValue(id, out var occurrenceCount) && occurrenceCount >= 2;
+                if (isOcr && !directElevations.ContainsKey(id) && !acceptedSpatialAnchor && !repeatedTextId)
                 {
-                    debug.AppendLine($"OCR text fallback rejected {id}: no spatial anchor/elevation pair and occurrences={occurrenceCount}.");
+                    debug.AppendLine($"OCR text fallback rejected {id}: no accepted spatial anchor/elevation pair and occurrences={occurrenceCount}.");
                     continue;
                 }
 
@@ -992,11 +991,14 @@ namespace SewerScan.Infrastructure.Parsers
                 var index = ordered.FindIndex(a => ReferenceEquals(a, anchor) ||
                     (a.Identifier == anchor.Identifier && Math.Abs(a.X - anchor.X) < 0.01 && Math.Abs(a.Y - anchor.Y) < 0.01));
 
+                var edgeHalfWidth = ordered.Count == 1
+                    ? Math.Max(140, pageWidth * 0.65)
+                    : Math.Max(45, pageWidth * 0.04);
                 var left = index <= 0
-                    ? anchor.X - Math.Max(45, pageWidth * 0.04)
+                    ? anchor.X - edgeHalfWidth
                     : (ordered[index - 1].X + anchor.X) / 2.0;
                 var right = index < 0 || index == ordered.Count - 1
-                    ? anchor.X + Math.Max(45, pageWidth * 0.04)
+                    ? anchor.X + edgeHalfWidth
                     : (anchor.X + ordered[index + 1].X) / 2.0;
 
                 var halfY = Math.Max(180, pageHeight * 0.32);
