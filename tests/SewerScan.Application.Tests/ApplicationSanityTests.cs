@@ -1,4 +1,4 @@
-using SewerScan.Application.Interfaces;
+﻿using SewerScan.Application.Interfaces;
 using Xunit;
 
 namespace SewerScan.Application.Tests;

@@ -1,4 +1,4 @@
-namespace SewerScan.Shared.Utilities;
+﻿namespace SewerScan.Shared.Utilities;
 
 public static class SharedMarker
 {

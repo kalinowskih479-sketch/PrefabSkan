@@ -3,16 +3,23 @@
 	<TargetFramework>net10.0</TargetFramework>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
+	<DocnetRuntime Condition=" '$([MSBuild]::IsOsPlatform(Windows))' ">win-x64</DocnetRuntime>
   </PropertyGroup>
   <ItemGroup>
 	<ProjectReference Include="..\SewerScan.Application\SewerScan.Application.csproj" />
 	<ProjectReference Include="..\SewerScan.Domain\SewerScan.Domain.csproj" />
   </ItemGroup>
-  <ItemGroup>
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
-	  <PrivateAssets>all</PrivateAssets>
-	</PackageReference>
-	<PackageReference Include="UglyToad.PdfPig" Version="0.1.9-alpha001-patch1" />
-  </ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+		<PrivateAssets>all</PrivateAssets>
+	  </PackageReference>
+	  <!-- Official PdfPig package. Replaces the old custom 1.7.0 build which failed on CAD xref tables. -->
+	  <PackageReference Include="PdfPig" Version="0.1.15" />
+	  <PackageReference Include="Docnet.Core" Version="2.6.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="13.2.1" />
+	  <PackageReference Include="Tesseract" Version="5.0.1" />
+	</ItemGroup>
 </Project>

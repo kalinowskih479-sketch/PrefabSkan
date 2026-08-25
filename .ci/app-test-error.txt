@@ -1,0 +1,154 @@
+PrefabScan 4.2.2 application-test diagnostics
+exit_code=1
+commit=b4d50b3695d2b926d1f5117e35b802a60601460f
+--- errors/failures ---
+348:[xUnit.net 00:00:00.39]       Stack Trace:
+364:  Failed SewerScan.Application.Tests.PrefabScan07RegressionTests.Pzt_Reconstructs_Split_D6Slash1_And_Keeps_Its_Own_Elevations [127 ms]
+365:  Error Message:
+369:  Stack Trace:
+376:[xUnit.net 00:00:00.45]       Stack Trace:
+383:[xUnit.net 00:00:00.45]       Stack Trace:
+386:  Failed SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise [138 ms]
+387:  Error Message:
+391:  Stack Trace:
+398:  Failed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Does_Not_Create_TextOnly_D60_Noise_Without_Elevations [9 ms]
+399:  Error Message:
+403:  Stack Trace:
+409:[xUnit.net 00:00:00.45]       Stack Trace:
+415:[xUnit.net 00:00:00.45]       Stack Trace:
+423:  Failed SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition [32 ms]
+424:  Error Message:
+427:  Stack Trace:
+430:  Failed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context [10 ms]
+431:  Error Message:
+434:  Stack Trace:
+441:[xUnit.net 00:00:00.46]       Stack Trace:
+448:[xUnit.net 00:00:00.46]       Stack Trace:
+453:  Failed SewerScan.Application.Tests.PrefabScan09RegressionTests.Pzt_Normalizes_Duplicated_Cad_Glyphs_For_D6Slash1_And_D7 [15 ms]
+454:  Error Message:
+458:  Stack Trace:
+463:  Failed SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions [3 ms]
+464:  Error Message:
+468:  Stack Trace:
+483:Test Run Failed.
+--- final 120 lines ---
+Actual:   133.55000000000001
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan07RegressionTests.Pzt_Reconstructs_Split_D6Slash1_And_Keeps_Its_Own_Elevations() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 249
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:00.45]     SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise [FAIL]
+[xUnit.net 00:00:00.45]       Assert.DoesNotContain() Failure: Filter matched in collection
+[xUnit.net 00:00:00.45]                                                                                                                                                                    ↓ (pos 1)
+[xUnit.net 00:00:00.45]       Collection: [ParsedManhole { CompletenessPercent = 0, Confidence = "średnia", Crown = null, DiameterMm = null, GroundElevationM = 62.850000000000001, ··· }, ParsedManhole { CompletenessPercent = 0, Confidence = "niska", Crown = null, DiameterMm = null, GroundElevationM = null, ··· }]
+[xUnit.net 00:00:00.45]       Stack Trace:
+[xUnit.net 00:00:00.45]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(475,0): at SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise()
+[xUnit.net 00:00:00.45]         --- End of stack trace from previous location ---
+[xUnit.net 00:00:00.45]     SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Does_Not_Create_TextOnly_D60_Noise_Without_Elevations [FAIL]
+[xUnit.net 00:00:00.45]       Assert.DoesNotContain() Failure: Filter matched in collection
+[xUnit.net 00:00:00.45]                    ↓ (pos 0)
+[xUnit.net 00:00:00.45]       Collection: [ParsedManhole { CompletenessPercent = 0, Confidence = "niska", Crown = null, DiameterMm = null, GroundElevationM = null, ··· }, ParsedManhole { CompletenessPercent = 0, Confidence = "niska", Crown = null, DiameterMm = null, GroundElevationM = null, ··· }]
+[xUnit.net 00:00:00.45]       Stack Trace:
+[xUnit.net 00:00:00.45]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(431,0): at SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Does_Not_Create_TextOnly_D60_Noise_Without_Elevations()
+[xUnit.net 00:00:00.45]         --- End of stack trace from previous location ---
+  Failed SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise [138 ms]
+  Error Message:
+   Assert.DoesNotContain() Failure: Filter matched in collection
+                                                                                                                                                             ↓ (pos 1)
+Collection: [ParsedManhole { CompletenessPercent = 0, Confidence = "średnia", Crown = null, DiameterMm = null, GroundElevationM = 62.850000000000001, ··· }, ParsedManhole { CompletenessPercent = 0, Confidence = "niska", Crown = null, DiameterMm = null, GroundElevationM = null, ··· }]
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Normalizes_Leading_Zero_Identifiers_And_Rejects_Unsupported_High_Noise() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 475
+--- End of stack trace from previous location ---
+  Passed SewerScan.Application.Tests.PrefabScan07RegressionTests.Pzt_Reconstructs_Split_D16_Identifier [4 ms]
+  Passed SewerScan.Application.Tests.PrefabScan39GeometryFirstTests.Geometry_First_Prefers_Repeated_Profile_Rows_Over_Nearby_Distractors [150 ms]
+  Passed SewerScan.Application.Tests.PrefabScan06RegressionTests.Profile_Recognises_Dotted_Identifiers_And_SO_But_Rejects_KsPipeLabels [15 ms]
+  Passed SewerScan.Application.Tests.PrefabScan08RegressionTests.Text_Fallback_Preserves_Wp_Prefix [15 ms]
+  Failed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Does_Not_Create_TextOnly_D60_Noise_Without_Elevations [9 ms]
+  Error Message:
+   Assert.DoesNotContain() Failure: Filter matched in collection
+             ↓ (pos 0)
+Collection: [ParsedManhole { CompletenessPercent = 0, Confidence = "niska", Crown = null, DiameterMm = null, GroundElevationM = null, ··· }, ParsedManhole { CompletenessPercent = 0, Confidence = "niska", Crown = null, DiameterMm = null, GroundElevationM = null, ··· }]
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Does_Not_Create_TextOnly_D60_Noise_Without_Elevations() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 431
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:00.45]     SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition [FAIL]
+[xUnit.net 00:00:00.45]       Assert.Contains() Failure: Filter not matched in collection
+[xUnit.net 00:00:00.45]       Collection: []
+[xUnit.net 00:00:00.45]       Stack Trace:
+[xUnit.net 00:00:00.45]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(495,0): at SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition()
+[xUnit.net 00:00:00.45]         --- End of stack trace from previous location ---
+[xUnit.net 00:00:00.45]     SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context [FAIL]
+[xUnit.net 00:00:00.45]       Assert.Contains() Failure: Filter not matched in collection
+[xUnit.net 00:00:00.45]       Collection: [ManholeTransition { DiameterMm = 160, Material = "PVC", Quantity = 1 }]
+[xUnit.net 00:00:00.45]       Stack Trace:
+[xUnit.net 00:00:00.45]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(454,0): at SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context()
+[xUnit.net 00:00:00.45]         --- End of stack trace from previous location ---
+  Passed SewerScan.Application.Tests.PrefabScan39GeometryFirstTests.Geometry_First_Does_Not_Promote_Pipe_Dn_When_Not_Repeated_As_Structure_Row [14 ms]
+  Passed SewerScan.Application.Tests.PrefabScan38MergerTests.Profile_Only_Object_With_Two_Engineering_Field_Groups_Can_Recover_Pzt_Ocr_Miss [1 ms]
+  Passed SewerScan.Application.Tests.PrefabScan38MergerTests.Profile_Elevations_Override_Pzt_Elevations_When_Coherent [< 1 ms]
+  Passed SewerScan.Application.Tests.PrefabScan38MergerTests.Bare_Profile_Only_Id_Is_Still_Rejected_With_Healthy_Pzt_Map [3 ms]
+  Passed SewerScan.Application.Tests.PrefabScan08RegressionTests.Item_Stream_Recovers_Split_D20_D21_D22 [9 ms]
+  Failed SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition [32 ms]
+  Error Message:
+   Assert.Contains() Failure: Filter not matched in collection
+Collection: []
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan21RegressionTests.Ocr_Spatial_Context_Recovers_Split_Pipe_Transition() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 495
+--- End of stack trace from previous location ---
+  Failed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context [10 ms]
+  Error Message:
+   Assert.Contains() Failure: Filter not matched in collection
+Collection: [ManholeTransition { DiameterMm = 160, Material = "PVC", Quantity = 1 }]
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Compact_Pvc160_Is_Recognised_As_Transition_In_Local_Context() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 454
+--- End of stack trace from previous location ---
+[xUnit.net 00:00:00.46]     SewerScan.Application.Tests.PrefabScan09RegressionTests.Pzt_Normalizes_Duplicated_Cad_Glyphs_For_D6Slash1_And_D7 [FAIL]
+[xUnit.net 00:00:00.46]       Assert.Equal() Failure: Values differ
+[xUnit.net 00:00:00.46]       Expected: 7.0800000000000001
+[xUnit.net 00:00:00.46]       Actual:   7.1399999999999997
+[xUnit.net 00:00:00.46]       Stack Trace:
+[xUnit.net 00:00:00.46]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(358,0): at SewerScan.Application.Tests.PrefabScan09RegressionTests.Pzt_Normalizes_Duplicated_Cad_Glyphs_For_D6Slash1_And_D7()
+[xUnit.net 00:00:00.46]         --- End of stack trace from previous location ---
+[xUnit.net 00:00:00.46]     SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions [FAIL]
+[xUnit.net 00:00:00.46]       Assert.Equal() Failure: Values differ
+[xUnit.net 00:00:00.46]       Expected: 2000
+[xUnit.net 00:00:00.46]       Actual:   null
+[xUnit.net 00:00:00.46]       Stack Trace:
+[xUnit.net 00:00:00.46]         /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs(61,0): at SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions()
+[xUnit.net 00:00:00.46]         --- End of stack trace from previous location ---
+  Passed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Pzt_Accepts_TwoDigit_Elevations_And_Computes_Height [11 ms]
+  Passed SewerScan.Application.Tests.SewerProjectParserTests.Parses_D_And_KD_Identifiers_Separately [16 ms]
+  Failed SewerScan.Application.Tests.PrefabScan09RegressionTests.Pzt_Normalizes_Duplicated_Cad_Glyphs_For_D6Slash1_And_D7 [15 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 7.0800000000000001
+Actual:   7.1399999999999997
+  Stack Trace:
+     at SewerScan.Application.Tests.PrefabScan09RegressionTests.Pzt_Normalizes_Duplicated_Cad_Glyphs_For_D6Slash1_And_D7() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 358
+--- End of stack trace from previous location ---
+  Passed SewerScan.Application.Tests.PrefabScan20OcrRegressionTests.Ocr_Repairs_ClosingBracket_In_Elevation [3 ms]
+  Passed SewerScan.Application.Tests.PrefabScan40HeightTests.Merge_Preserves_Profile_Derived_PrefabHeight_Instead_Of_Recomputing_RawDepth [1 ms]
+  Failed SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions [3 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 2000
+Actual:   null
+  Stack Trace:
+     at SewerScan.Application.Tests.SewerProjectParserTests.Parses_Manhole_Details_And_Transitions() in /home/runner/work/PrefabSkan/PrefabSkan/tests/SewerScan.Application.Tests/SewerProjectParserTests.cs:line 61
+--- End of stack trace from previous location ---
+  Passed SewerScan.Application.Tests.SewerProjectSpatialParserTests.Spatial_Mode_Keeps_Transitions_With_Their_Own_Manhole [25 ms]
+[xUnit.net 00:00:00.46]   Finished:    SewerScan.Application.Tests
+  Passed SewerScan.Application.Tests.PrefabScan37ArchitectureTests.Explicit_Pzt_Hint_Wins_Over_Profile_Words [3 ms]
+  Passed SewerScan.Application.Tests.SewerProjectParserTests.Does_Not_Merge_Different_Manholes_With_The_Same_Diameter [7 ms]
+  Passed SewerScan.Application.Tests.PrefabScan37ArchitectureTests.Profile_Row_Bands_Assign_Elevations_By_Structure_Column [8 ms]
+  Passed SewerScan.Application.Tests.SewerProjectSpatialParserTests.Spatial_Mode_Does_Not_Treat_1013_As_Manhole_Diameter [11 ms]
+  Passed SewerScan.Application.Tests.ProjectMergerTests.Merge_FlagsConflictingElevations_InsteadOfSilentlyAveraging [16 ms]
+  Passed SewerScan.Application.Tests.PrefabScan37ArchitectureTests.Profile_Repeated_Dn_Row_Can_Assign_Standard_Manhole_Diameter [3 ms]
+  Passed SewerScan.Application.Tests.ProjectMergerTests.Merge_DoesNotDoubleTransitionQuantityAcrossDrawings [3 ms]
+  Passed SewerScan.Application.Tests.ProjectMergerTests.Merge_NormalizesWpPrefix [1 ms]
+  Passed SewerScan.Application.Tests.ProjectMergerTests.Merge_ComplementsPztWithProfileData_ByIdentifier [< 1 ms]
+
+Test Run Failed.
+Total tests: 35
+     Passed: 28
+     Failed: 7
+ Total time: 0.9553 Seconds
