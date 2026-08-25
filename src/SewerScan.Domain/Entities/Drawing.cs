@@ -1,4 +1,4 @@
-namespace SewerScan.Domain.Entities;
+﻿namespace SewerScan.Domain.Entities;
 
 public class Drawing
 {

@@ -1,0 +1,13 @@
+﻿<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SewerScan.UI/SewerScan.UI.csproj" />
+    <Project Path="src/SewerScan.Application/SewerScan.Application.csproj" />
+    <Project Path="src/SewerScan.Domain/SewerScan.Domain.csproj" />
+    <Project Path="src/SewerScan.Infrastructure/SewerScan.Infrastructure.csproj" />
+    <Project Path="src/SewerScan.Shared/SewerScan.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj" />
+    <Project Path="tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
