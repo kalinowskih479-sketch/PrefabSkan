@@ -1,0 +1,65 @@
+name: Diagnose PrefabScan 4.2.2
+
+on:
+  push:
+    branches:
+      - sync/prefabscan-4.2.2
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose-application-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: sync/prefabscan-4.2.2
+          fetch-depth: 0
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore application tests
+        run: dotnet restore tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj
+
+      - name: Run application tests and capture diagnostics
+        id: app_tests
+        shell: bash
+        run: |
+          mkdir -p .ci
+          set +e
+          dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --no-restore --logger "console;verbosity=normal" > /tmp/app-test.log 2>&1
+          code=$?
+          {
+            echo "PrefabScan 4.2.2 application-test diagnostics"
+            echo "exit_code=$code"
+            echo "commit=$(git rev-parse HEAD)"
+            echo "--- errors/failures ---"
+            grep -nE 'error (CS|NU|NETSDK|MSB)[0-9]+|error:|Failed!|Failed |Error Message:|Stack Trace:|Test Run Failed|Build FAILED|Unhandled exception' /tmp/app-test.log || true
+            echo "--- final 120 lines ---"
+            tail -n 120 /tmp/app-test.log
+          } > .ci/app-test-error.txt
+          cat .ci/app-test-error.txt
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Commit diagnostics to branch
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .ci/app-test-error.txt
+          if ! git diff --cached --quiet; then
+            git commit -m "ci: capture PrefabScan 4.2.2 application test failure"
+            git push origin HEAD:sync/prefabscan-4.2.2
+          fi
+
+      - name: Preserve failing status
+        if: steps.app_tests.outputs.exit_code != '0'
+        run: exit 1
