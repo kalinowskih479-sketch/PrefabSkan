@@ -90,6 +90,10 @@ namespace SewerScan.Infrastructure.Parsers
                 // other manholes elsewhere on the same drawing.
                 var spatialManholesParsed = ParseSpatialManholes(page, result, debug);
                 var spatialInletsParsed = ParseSpatialInlets(page, result, debug);
+                var isOcrPage = (page.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase);
+                var hasUsableSpatialWords = page.Items != null && page.Items.Any(i =>
+                    !string.IsNullOrWhiteSpace(i.Text) &&
+                    (Math.Abs(i.X) > 0.001 || Math.Abs(i.Y) > 0.001 || i.Width > 0.001 || i.Height > 0.001));
 
                 foreach (var rawLine in lines)
                 {
@@ -105,7 +109,7 @@ namespace SewerScan.Infrastructure.Parsers
 
                     // Legacy text-only mode remains as a fallback for PDFs without
                     // usable coordinates or for OCR-only pages.
-                    if (!spatialManholesParsed)
+                    if (!spatialManholesParsed && !(isOcrPage && hasUsableSpatialWords))
                     {
                         ParseManholes(line, page.PageNumber, result, debug);
                         ParseDescriptiveManholes(
@@ -113,6 +117,10 @@ namespace SewerScan.Infrastructure.Parsers
                             page.PageNumber,
                             result,
                             debug);
+                    }
+                    else if (!spatialManholesParsed && isOcrPage)
+                    {
+                        debug.AppendLine("OCR legacy text fallback suppressed: coordinate words exist but no credible manhole anchor was found.");
                     }
 
                     if (!spatialInletsParsed)
@@ -306,6 +314,8 @@ namespace SewerScan.Infrastructure.Parsers
                 .Where(i => !string.IsNullOrWhiteSpace(i.Text))
                 .Where(i => Math.Abs(i.X) > 0.001 || Math.Abs(i.Y) > 0.001 || i.Width > 0.001 || i.Height > 0.001)
                 .ToList();
+            var hasDuplicatedCadGlyphs = usable.Any(i =>
+                !string.Equals(NormalizeCadDuplicatedGlyphs(i.Text), (i.Text ?? string.Empty).Trim(), StringComparison.Ordinal));
 
             // AutoCAD/plotter PDFs frequently expose duplicated glyphs (e.g. DD + 66//11)
             // and split elevations (1 + 2 + 6,47).  Add synthetic numeric words without
@@ -404,6 +414,8 @@ namespace SewerScan.Infrastructure.Parsers
                     assignedElevations = profilePair;
                 else if (directTextElevations.TryGetValue(anchor.Identifier, out var directPair))
                     assignedElevations = directPair;
+                else if (pztLike && hasDuplicatedCadGlyphs && spatialPztElevations.TryGetValue(anchor.Identifier, out var cadSpatialPair))
+                    assignedElevations = cadSpatialPair;
                 else if (orderedPztElevations.TryGetValue(anchor.Identifier, out var orderedPair))
                     assignedElevations = orderedPair;
                 else if (spatialPztElevations.TryGetValue(anchor.Identifier, out var spatialPair))
