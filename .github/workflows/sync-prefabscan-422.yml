@@ -7,12 +7,11 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
-      - 'tools/apply_prefabscan_regression_fixes.py'
       - '.github/workflows/sync-prefabscan-422.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   test:
@@ -23,23 +22,6 @@ jobs:
         with:
           ref: sync/prefabscan-4.2.2
           fetch-depth: 0
-
-      - name: Apply parser regression fixes
-        run: python tools/apply_prefabscan_regression_fixes.py
-
-      - name: Persist parser fixes
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'PrefabScan Dev Bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git add src/SewerScan.Infrastructure/Parsers/SewerProjectParser.cs tests/SewerScan.Application.Tests/SewerProjectParserTests.cs
-          git diff --cached --check
-          if ! git diff --cached --quiet; then
-            git commit -m 'fix: harden OCR fallback and parser merge logic'
-            git pull --rebase origin sync/prefabscan-4.2.2
-            git push origin HEAD:sync/prefabscan-4.2.2
-          fi
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
