@@ -126,3 +126,5 @@ jobs:
           git commit -m 'fix: harden OCR fallback and local parser context'
           git pull --rebase origin sync/prefabscan-4.2.2
           git push origin HEAD:sync/prefabscan-4.2.2
+
+# Triggered intentionally after baseline diagnostics were captured.
