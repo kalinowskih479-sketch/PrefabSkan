@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -174,10 +174,10 @@ namespace SewerScan.Infrastructure.Parsers
                     if (string.IsNullOrWhiteSpace(match.Type) && !string.IsNullOrWhiteSpace(mh.Type))
                         match.Type = mh.Type;
 
-                    if (match.DiameterMm == 0 && mh.DiameterMm > 0)
+                    if (!match.DiameterMm.HasValue && mh.DiameterMm.HasValue && mh.DiameterMm.Value > 0)
                         match.DiameterMm = mh.DiameterMm;
 
-                    if (match.HeightM == 0 && mh.HeightM > 0)
+                    if (!match.HeightM.HasValue && mh.HeightM.HasValue && mh.HeightM.Value > 0)
                         match.HeightM = mh.HeightM;
 
                     if (!match.GroundElevationM.HasValue && mh.GroundElevationM.HasValue)
@@ -2829,10 +2829,10 @@ namespace SewerScan.Infrastructure.Parsers
                         existing.Type = !string.Equals(type, "BRAK DANYCH", StringComparison.OrdinalIgnoreCase) ? type : existing.Type;
                     }
 
-                    if (existing.DiameterMm == 0 && diam > 0)
+                    if (!existing.DiameterMm.HasValue && diam > 0)
                         existing.DiameterMm = diam;
 
-                    if (existing.HeightM == 0 && heightMatch.Success && heightMatch.Groups["h"]?.Success == true)
+                    if (!existing.HeightM.HasValue && heightMatch.Success && heightMatch.Groups["h"]?.Success == true)
                     {
                         var htxt = heightMatch.Groups["h"].Value.Replace(',', '.');
                         if (double.TryParse(htxt, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var hv))

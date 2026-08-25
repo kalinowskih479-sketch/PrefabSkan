@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using SewerScan.Application.Models;
 using SewerScan.Infrastructure.Parsers;
@@ -246,11 +246,11 @@ public class PrefabScan07RegressionTests
         var d61 = Assert.Single(result.Manholes.Where(x => x.Identifier == "D6/1"));
         var d7 = Assert.Single(result.Manholes.Where(x => x.Identifier == "D7"));
 
-        Assert.Equal(134.15, d61.GroundElevationM);
+        Assert.Equal(133.55, d61.GroundElevationM);
         Assert.Equal(126.47, d61.InvertElevationM);
         Assert.Equal(7.08, d61.HeightM);
 
-        Assert.Equal(134.15, d7.GroundElevationM);
+        Assert.Equal(133.65, d7.GroundElevationM);
         Assert.Equal(126.51, d7.InvertElevationM);
         Assert.Equal(7.14, d7.HeightM);
     }
