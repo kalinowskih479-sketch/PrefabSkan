@@ -22,14 +22,10 @@ public class Batorego424RegressionTests
         page.Items.AddRange(new[]
         {
             new TextItem { Text = "D6", X = 500, Y = 500, Width = 16, Height = 10 },
-
-            // Batorego OCR pattern: the same level is emitted several times and is slightly
-            // closer to the identifier than the second distinct level.
             new TextItem { Text = "62,25", X = 494, Y = 482, Width = 30, Height = 10 },
             new TextItem { Text = "62,25", X = 496, Y = 480, Width = 30, Height = 10 },
             new TextItem { Text = "62,25", X = 498, Y = 478, Width = 30, Height = 10 },
             new TextItem { Text = "62,25", X = 500, Y = 476, Width = 30, Height = 10 },
-
             new TextItem { Text = "60,58", X = 505, Y = 455, Width = 30, Height = 10 },
             new TextItem { Text = "60,58", X = 507, Y = 453, Width = 30, Height = 10 }
         });
@@ -40,5 +36,41 @@ public class Batorego424RegressionTests
         Assert.Equal(62.25, d6.GroundElevationM);
         Assert.Equal(60.58, d6.InvertElevationM);
         Assert.Equal(1.67, d6.HeightM);
+    }
+
+    [Fact]
+    public async Task Pzt_Recovers_Repeated_Local_Levels_When_Ocr_Geometry_Is_Displaced_From_Id()
+    {
+        var parser = new SewerProjectParser();
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "[[PREFABSCAN_DRAWING:PZT]] D6",
+            ExtractionEngine = "OCR/Tesseract tiled"
+        };
+
+        page.Items.AddRange(new[]
+        {
+            new TextItem { Text = "D6", X = 500, Y = 500, Width = 16, Height = 10 },
+
+            // Real tiled OCR can preserve the right local block but shift the numeric words
+            // far enough that the strict 42 px PZT pair matcher rejects them.
+            new TextItem { Text = "62,25", X = 575, Y = 480, Width = 30, Height = 10 },
+            new TextItem { Text = "62,25", X = 577, Y = 478, Width = 30, Height = 10 },
+            new TextItem { Text = "60,58", X = 578, Y = 455, Width = 30, Height = 10 },
+            new TextItem { Text = "60,58", X = 580, Y = 453, Width = 30, Height = 10 },
+
+            // Distractor pipe values from the same local OCR block.
+            new TextItem { Text = "160", X = 545, Y = 520, Width = 18, Height = 10 },
+            new TextItem { Text = "180", X = 550, Y = 535, Width = 18, Height = 10 }
+        });
+
+        var result = await parser.ParseAsync(new[] { page });
+        var d6 = Assert.Single(result.Manholes.Where(m => m.Identifier == "D6"));
+
+        Assert.Equal(62.25, d6.GroundElevationM);
+        Assert.Equal(60.58, d6.InvertElevationM);
+        Assert.Equal(1.67, d6.HeightM);
+        Assert.Null(d6.DiameterMm);
     }
 }
