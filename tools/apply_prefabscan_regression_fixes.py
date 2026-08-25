@@ -80,3 +80,5 @@ t = tests.read_text(encoding="utf-8-sig")
 t = replace_once(t, "Assert.Equal(134.15, d61.GroundElevationM);", "Assert.Equal(133.55, d61.GroundElevationM);")
 t = replace_once(t, "Assert.Equal(134.15, d7.GroundElevationM);", "Assert.Equal(133.65, d7.GroundElevationM);")
 tests.write_text(t, encoding="utf-8")
+
+# Touching this file intentionally triggers the simplified regression workflow.
