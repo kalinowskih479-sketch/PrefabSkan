@@ -7,11 +7,12 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
+      - 'tools/**'
       - '.github/workflows/sync-prefabscan-422.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   test:
@@ -22,6 +23,19 @@ jobs:
         with:
           ref: sync/prefabscan-4.2.2
           fetch-depth: 0
+
+      - name: Apply Batorego profile row fix
+        run: python3 tools/apply_batorego_profile_row_fix.py
+
+      - name: Persist source fix when needed
+        run: |
+          if ! git diff --quiet -- src/SewerScan.Infrastructure/Parsers/SewerProjectParser.cs; then
+            git config user.name "PrefabScan Fix Bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add src/SewerScan.Infrastructure/Parsers/SewerProjectParser.cs
+            git commit -m "fix: score profile node rows by engineering geometry"
+            git push origin HEAD:sync/prefabscan-4.2.2
+          fi
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
