@@ -1,0 +1,128 @@
+name: Apply first PrefabScan parser regression fixes
+
+on:
+  push:
+    branches:
+      - sync/prefabscan-4.2.2
+    paths:
+      - '.github/workflows/apply-parser-fixes.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          ref: sync/prefabscan-4.2.2
+          fetch-depth: 0
+
+      - name: Apply verified regression fixes
+        shell: python
+        run: |
+          from pathlib import Path
+
+          parser = Path('src/SewerScan.Infrastructure/Parsers/SewerProjectParser.cs')
+          s = parser.read_text(encoding='utf-8-sig')
+
+          replacements = [
+              (
+                  'if (match.DiameterMm == 0 && mh.DiameterMm > 0)\n                        match.DiameterMm = mh.DiameterMm;',
+                  'if (!match.DiameterMm.HasValue && mh.DiameterMm.HasValue && mh.DiameterMm.Value > 0)\n                        match.DiameterMm = mh.DiameterMm;'
+              ),
+              (
+                  'if (match.HeightM == 0 && mh.HeightM > 0)\n                        match.HeightM = mh.HeightM;',
+                  'if (!match.HeightM.HasValue && mh.HeightM.HasValue && mh.HeightM.Value > 0)\n                        match.HeightM = mh.HeightM;'
+              ),
+              (
+                  'if (existing.DiameterMm == 0 && diam > 0)\n                        existing.DiameterMm = diam;',
+                  'if (!existing.DiameterMm.HasValue && diam > 0)\n                        existing.DiameterMm = diam;'
+              ),
+              (
+                  'if (existing.HeightM == 0 && heightMatch.Success && heightMatch.Groups["h"]?.Success == true)',
+                  'if (!existing.HeightM.HasValue && heightMatch.Success && heightMatch.Groups["h"]?.Success == true)'
+              ),
+              (
+                  '''                var repeatedOcrId = identifierOccurrences.TryGetValue(id, out var occurrenceCount) && occurrenceCount >= 2;
+                if (isOcr && !directElevations.ContainsKey(id) && !repeatedOcrId)
+                {
+                    debug.AppendLine($"OCR text fallback rejected {id}: no spatial anchor/elevation pair and occurrences={occurrenceCount}.");
+                    continue;
+                }''',
+                  '''                var acceptedSpatialAnchor = spatialAnchors.Any(a =>
+                    string.Equals(a.Identifier, id, StringComparison.OrdinalIgnoreCase));
+                var repeatedTextId = identifierOccurrences.TryGetValue(id, out var occurrenceCount) && occurrenceCount >= 2;
+                if (isOcr && !directElevations.ContainsKey(id) && !acceptedSpatialAnchor && !repeatedTextId)
+                {
+                    debug.AppendLine($"OCR text fallback rejected {id}: no accepted spatial anchor/elevation pair and occurrences={occurrenceCount}.");
+                    continue;
+                }'''
+              ),
+              (
+                  '''                foreach (var a in FindSpatialManholeAnchors(page.Items, result.DrawingType))
+                {
+                    identifiers.Add(a.Identifier);
+                    CountIdentifier(a.Identifier);
+                }''',
+                  '''                foreach (var a in FindSpatialManholeAnchors(page.Items, result.DrawingType))
+                    identifiers.Add(a.Identifier);'''
+              ),
+              (
+                  '''                var left = index <= 0
+                    ? anchor.X - Math.Max(45, pageWidth * 0.04)
+                    : (ordered[index - 1].X + anchor.X) / 2.0;
+                var right = index < 0 || index == ordered.Count - 1
+                    ? anchor.X + Math.Max(45, pageWidth * 0.04)
+                    : (anchor.X + ordered[index + 1].X) / 2.0;''',
+                  '''                var edgeHalfWidth = ordered.Count == 1
+                    ? Math.Max(140, pageWidth * 0.65)
+                    : Math.Max(45, pageWidth * 0.04);
+                var left = index <= 0
+                    ? anchor.X - edgeHalfWidth
+                    : (ordered[index - 1].X + anchor.X) / 2.0;
+                var right = index < 0 || index == ordered.Count - 1
+                    ? anchor.X + edgeHalfWidth
+                    : (anchor.X + ordered[index + 1].X) / 2.0;'''
+              )
+          ]
+
+          for old, new in replacements:
+              if old not in s:
+                  raise SystemExit(f'Expected parser fragment not found: {old[:80]!r}')
+              s = s.replace(old, new, 1)
+          parser.write_text(s, encoding='utf-8')
+
+          tests = Path('tests/SewerScan.Application.Tests/SewerProjectParserTests.cs')
+          t = tests.read_text(encoding='utf-8-sig')
+          old1 = '''Assert.Equal(134.15, d61.GroundElevationM);
+        Assert.Equal(126.47, d61.InvertElevationM);
+        Assert.Equal(7.08, d61.HeightM);'''
+          new1 = '''Assert.Equal(133.55, d61.GroundElevationM);
+        Assert.Equal(126.47, d61.InvertElevationM);
+        Assert.Equal(7.08, d61.HeightM);'''
+          old2 = '''Assert.Equal(134.15, d7.GroundElevationM);
+        Assert.Equal(126.51, d7.InvertElevationM);
+        Assert.Equal(7.14, d7.HeightM);'''
+          new2 = '''Assert.Equal(133.65, d7.GroundElevationM);
+        Assert.Equal(126.51, d7.InvertElevationM);
+        Assert.Equal(7.14, d7.HeightM);'''
+          if old1 not in t or old2 not in t:
+              raise SystemExit('Expected inconsistent elevation assertions not found')
+          t = t.replace(old1, new1, 1).replace(old2, new2, 1)
+          tests.write_text(t, encoding='utf-8')
+
+      - name: Commit fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'PrefabScan Dev Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add src/SewerScan.Infrastructure/Parsers/SewerProjectParser.cs tests/SewerScan.Application.Tests/SewerProjectParserTests.cs
+          git diff --cached --check
+          git commit -m 'fix: harden OCR fallback and local parser context'
+          git pull --rebase origin sync/prefabscan-4.2.2
+          git push origin HEAD:sync/prefabscan-4.2.2
