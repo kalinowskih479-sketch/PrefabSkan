@@ -40,6 +40,27 @@ jobs:
           cp .import-422/PrefabScan_4.2.2/PrefabScan.slnx ./PrefabScan.slnx
           cp .import-422/PrefabScan_4.2.2/.gitignore ./.gitignore
           cp .import-422/PrefabScan_4.2.2/README_PREFABSCAN.md ./README_PREFABSCAN.md
+          rm -rf .import-422
+
+      - name: Commit synchronized source before tests
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'PrefabScan Sync Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add src tests PrefabScan.sln PrefabScan.slnx .gitignore README_PREFABSCAN.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'Sync PrefabScan 4.2.2 source and tests'
+            git push origin HEAD:sync/prefabscan-4.2.2
+          fi
+
+      - name: Show OCR source diagnostics
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '--- OcrFallbackExtractor references ---'
+          grep -Rni --include='*.cs' -E 'Pix\.Scale|OcrFallbackExtractor|Scale\(' src tests || true
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
@@ -56,19 +77,3 @@ jobs:
 
       - name: Run domain tests
         run: dotnet test tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj --no-restore --configuration Release --verbosity normal
-
-      - name: Commit synchronized source
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-        shell: bash
-        run: |
-          set -euo pipefail
-          rm -rf .import-422
-          git config user.name 'PrefabScan Sync Bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git add src tests PrefabScan.sln PrefabScan.slnx .gitignore README_PREFABSCAN.md
-          if git diff --cached --quiet; then
-            echo 'No source changes to commit.'
-            exit 0
-          fi
-          git commit -m 'Sync PrefabScan 4.2.2 source and tests'
-          git push origin HEAD:sync/prefabscan-4.2.2
