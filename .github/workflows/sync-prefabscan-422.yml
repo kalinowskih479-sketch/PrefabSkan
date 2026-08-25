@@ -1,0 +1,70 @@
+name: Sync PrefabScan 4.2.2 source
+
+on:
+  push:
+    branches:
+      - sync/prefabscan-4.2.2
+    paths:
+      - 'PrefabScan_4.2.2_SOURCE.zip'
+      - '.github/workflows/sync-prefabscan-422.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: sync/prefabscan-4.2.2
+          fetch-depth: 0
+
+      - name: Extract 4.2.2 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .import-422
+          mkdir .import-422
+          unzip -q PrefabScan_4.2.2_SOURCE.zip -d .import-422
+          test -d .import-422/PrefabScan_4.2.2/src
+          test -d .import-422/PrefabScan_4.2.2/tests
+          rsync -a --delete .import-422/PrefabScan_4.2.2/src/ src/
+          rsync -a --delete .import-422/PrefabScan_4.2.2/tests/ tests/
+          cp .import-422/PrefabScan_4.2.2/PrefabScan.sln ./PrefabScan.sln
+          cp .import-422/PrefabScan_4.2.2/PrefabScan.slnx ./PrefabScan.slnx
+          cp .import-422/PrefabScan_4.2.2/.gitignore ./.gitignore
+          cp .import-422/PrefabScan_4.2.2/README_PREFABSCAN.md ./README_PREFABSCAN.md
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore test projects
+        run: |
+          dotnet restore tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj
+          dotnet restore tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj
+
+      - name: Run application tests
+        run: dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --no-restore --configuration Release --verbosity normal
+
+      - name: Run domain tests
+        run: dotnet test tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj --no-restore --configuration Release --verbosity normal
+
+      - name: Commit synchronized source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .import-422
+          git config user.name 'PrefabScan Sync Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add src tests PrefabScan.sln PrefabScan.slnx .gitignore README_PREFABSCAN.md
+          if git diff --cached --quiet; then
+            echo 'No source changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Sync PrefabScan 4.2.2 source and tests'
+          git push origin HEAD:sync/prefabscan-4.2.2
