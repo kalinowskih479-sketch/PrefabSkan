@@ -1,0 +1,36 @@
+name: Build PrefabScan 4.2.6
+
+on:
+  push:
+    branches:
+      - fix/prefabscan-4.2.6
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/prefabscan-4.2.6
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Run application tests
+        run: dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --configuration Release
+      - name: Run domain tests
+        run: dotnet test tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj --configuration Release
+      - name: Publish Windows x64
+        run: dotnet publish src/SewerScan.UI/SewerScan.UI.csproj -c Release -r win-x64 --self-contained true -o publish/PrefabScan_4.2.6
+      - name: Package ZIP
+        shell: pwsh
+        run: Compress-Archive -Path publish/PrefabScan_4.2.6/* -DestinationPath PrefabScan_4.2.6_Windows_x64.zip -Force
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: PrefabScan_4.2.6_Windows_x64
+          path: PrefabScan_4.2.6_Windows_x64.zip
