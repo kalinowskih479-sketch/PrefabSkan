@@ -488,7 +488,9 @@ namespace SewerScan.Infrastructure.Parsers
                 {
                     Item = item,
                     Index = index,
-                    Token = CleanSpatialToken(item.Text),
+                    // Node indices such as 11 are legitimate. Do not run CAD duplicate-glyph
+                    // normalization here, because it would collapse "11" to "1".
+                    Token = Regex.Replace((item.Text ?? string.Empty).Trim(), @"^[^0-9]+|[^0-9]+$", string.Empty),
                     X = item.X + item.Width / 2.0,
                     Y = item.Y - item.Height / 2.0
                 })
