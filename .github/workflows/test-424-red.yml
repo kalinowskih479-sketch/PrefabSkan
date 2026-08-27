@@ -1,0 +1,20 @@
+name: PrefabScan 4.2.4 RED regression
+
+on:
+  push:
+    branches:
+      - fix/prefabscan-4.2.4-red
+    paths:
+      - '.github/workflows/test-424-red.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Run Batorego 4.2.4 regressions
+        run: dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --filter FullyQualifiedName~Batorego424RegressionTests --no-restore
