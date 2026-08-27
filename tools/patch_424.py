@@ -3,35 +3,16 @@ from pathlib import Path
 path = Path('src/SewerScan.Infrastructure/Parsers/SewerProjectParser.cs')
 text = path.read_text(encoding='utf-8-sig')
 
-old_call = 'anchors = SelectProfileTableAnchors(anchors, usable, debug);'
-new_call = 'anchors = SelectProfileTableAnchors(anchors, usable, page.Text ?? string.Empty, debug);'
-if old_call not in text:
-    raise SystemExit('SelectProfileTableAnchors call not found')
-text = text.replace(old_call, new_call, 1)
+old = '''                    var dx = Math.Abs(pair.X - anchor.X);\n                    var dy = Math.Abs(pair.Y - anchor.Y);\n                    if (pair.Horizontal)\n                    {\n                        if (dx > 85 || dy > 18)\n                            continue;\n                    }\n                    else\n                    {\n                        if (dx > 32 || dy > 58)\n                            continue;\n                    }'''
 
-old_sig = '''        private static List<SpatialManholeAnchor> SelectProfileTableAnchors(\n            IReadOnlyList<SpatialManholeAnchor> candidates,\n            IReadOnlyList<TextItem> items,\n            StringBuilder debug)'''
-new_sig = '''        private static List<SpatialManholeAnchor> SelectProfileTableAnchors(\n            IReadOnlyList<SpatialManholeAnchor> candidates,\n            IReadOnlyList<TextItem> items,\n            string pageText,\n            StringBuilder debug)'''
-if old_sig not in text:
-    raise SystemExit('SelectProfileTableAnchors signature not found')
-text = text.replace(old_sig, new_sig, 1)
+new = '''                    var dx = Math.Abs(pair.X - anchor.X);\n                    var dy = Math.Abs(pair.Y - anchor.Y);\n\n                    // 4.2.4 Batorego: tiled OCR often returns each rendered level two to four\n                    // times. That repetition is useful confidence evidence. In the real PZT the\n                    // repeated level stack can be displaced 70-90 px from the D/S label, so the\n                    // old 32 px vertical-pair gate discarded otherwise unambiguous 62,25/60,58\n                    // pairs. Only widen the ownership window when BOTH levels are independently\n                    // repeated near the pair; ordinary one-off numbers keep the strict gate.\n                    var repeatedGround = numeric.Count(n =>\n                        Math.Abs(n.Value - pair.Ground) < 0.001 &&\n                        Math.Abs(n.X - pair.X) <= 105 &&\n                        Math.Abs(n.Y - pair.Y) <= 85) >= 2;\n                    var repeatedInvert = numeric.Count(n =>\n                        Math.Abs(n.Value - pair.Invert) < 0.001 &&\n                        Math.Abs(n.X - pair.X) <= 105 &&\n                        Math.Abs(n.Y - pair.Y) <= 85) >= 2;\n                    var strongRepeatedPair = repeatedGround && repeatedInvert;\n\n                    if (pair.Horizontal)\n                    {\n                        if (dx > 85 || dy > 18)\n                            continue;\n                    }\n                    else\n                    {\n                        var maxDx = strongRepeatedPair ? 95 : 32;\n                        var maxDy = strongRepeatedPair ? 75 : 58;\n                        if (dx > maxDx || dy > maxDy)\n                            continue;\n                    }'''
 
-old_before_best = '''            // 4.2.3: the densest OCR band is not necessarily the profile node row.\n            // Batorego produced a denser garbage band (S79, S13, S06/09, S61.16...)\n            // than the actual structure row. Score each band by engineering-table support:\n            // repeated elevation values and standard manhole DN values in the same X columns.\n            var best = bands'''
-new_before_best = '''            // 4.2.4: use the network family as engineering evidence too. On Polish sewer\n            // drawings the deszczowa profile is normally D/KD and sanitarna is S/KS.\n            // OCR may still hallucinate a numerically stronger band from the opposite network.\n            var preferredFamily = Regex.IsMatch(pageText ?? string.Empty, @"KANALIZACJI\\s+DESZCZ|DESZCZOW", RegexOptions.IgnoreCase)\n                ? "D"\n                : Regex.IsMatch(pageText ?? string.Empty, @"KANALIZACJI\\s+SANITAR|SANITARN", RegexOptions.IgnoreCase)\n                    ? "S"\n                    : string.Empty;\n\n            // 4.2.3: the densest OCR band is not necessarily the profile node row.\n            // Batorego produced a denser garbage band (S79, S13, S06/09, S61.16...)\n            // than the actual structure row. Score each band by engineering-table support:\n            // repeated elevation values and standard manhole DN values in the same X columns.\n            var best = bands'''
-if old_before_best not in text:
-    raise SystemExit('profile score preamble not found')
-text = text.replace(old_before_best, new_before_best, 1)
-
-old_score = '''                    var score = engineeringColumns * 24.0 + dnColumns * 14.0 + distinct * 2.0 - syntaxPenalty;\n                    return new { Band = b, Distinct = distinct, Width = width, EngineeringColumns = engineeringColumns, DnColumns = dnColumns, Score = score };'''
-new_score = '''                    var uniqueAnchors = b.GroupBy(x => x.Identifier, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList();\n                    var familyMatches = string.IsNullOrWhiteSpace(preferredFamily)\n                        ? 0\n                        : uniqueAnchors.Count(a => preferredFamily == "D"\n                            ? Regex.IsMatch(a.Identifier, @"^(?:D|KD)\\d", RegexOptions.IgnoreCase)\n                            : Regex.IsMatch(a.Identifier, @"^(?:S|KS)\\d", RegexOptions.IgnoreCase));\n                    var familyMismatches = string.IsNullOrWhiteSpace(preferredFamily)\n                        ? 0\n                        : uniqueAnchors.Count - familyMatches;\n\n                    var score = engineeringColumns * 24.0 + dnColumns * 14.0 + distinct * 2.0 - syntaxPenalty\n                                + familyMatches * 28.0 - familyMismatches * 18.0;\n                    return new { Band = b, Distinct = distinct, Width = width, EngineeringColumns = engineeringColumns, DnColumns = dnColumns, FamilyMatches = familyMatches, FamilyMismatches = familyMismatches, Score = score };'''
-if old_score not in text:
-    raise SystemExit('profile score expression not found')
-text = text.replace(old_score, new_score, 1)
-
-old_debug = 'debug.AppendLine($"4.2.3 profile node-band score: score={best.Score:0.0}, engineering={best.EngineeringColumns}, dn={best.DnColumns}, ids={best.Distinct}.");'
-new_debug = 'debug.AppendLine($"4.2.4 profile node-band score: score={best.Score:0.0}, family={preferredFamily}, familyMatch={best.FamilyMatches}, familyMismatch={best.FamilyMismatches}, engineering={best.EngineeringColumns}, dn={best.DnColumns}, ids={best.Distinct}.");'
-if old_debug not in text:
-    raise SystemExit('profile score debug line not found')
-text = text.replace(old_debug, new_debug, 1)
-
-path.write_text(text, encoding='utf-8')
-print('Patched SewerProjectParser.cs for 4.2.4 family-aware profile selection')
+if old not in text:
+    if 'var strongRepeatedPair = repeatedGround && repeatedInvert;' in text:
+        print('4.2.4 repeated-level ownership patch already applied')
+    else:
+        raise SystemExit('BuildPztElevationAssignments ownership block not found')
+else:
+    text = text.replace(old, new, 1)
+    path.write_text(text, encoding='utf-8')
+    print('Applied 4.2.4 repeated-level ownership patch')
