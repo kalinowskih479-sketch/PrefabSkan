@@ -1,9 +1,9 @@
-name: Apply PrefabScan 4.2.4 resolver patch
+name: Build PrefabScan 4.2.4
 
 on:
   push:
     branches:
-      - sync/prefabscan-4.2.2
+      - fix/prefabscan-4.2.4-work
     paths:
       - 'tools/patch_424.py'
       - '.github/workflows/apply-424.yml'
@@ -13,26 +13,50 @@ permissions:
   contents: write
 
 jobs:
-  apply:
-    runs-on: ubuntu-latest
+  patch-test-build:
+    runs-on: windows-latest
     steps:
-      - name: Checkout branch
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: sync/prefabscan-4.2.2
+          ref: fix/prefabscan-4.2.4-work
           fetch-depth: 0
 
-      - name: Apply 4.2.4 patch
-        run: python3 tools/patch_424.py
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
 
-      - name: Commit source change
+      - name: Apply 4.2.4 repeated-level patch
+        shell: pwsh
+        run: python tools/patch_424.py
+
+      - name: Commit source patch
+        shell: pwsh
         run: |
           git config user.name "PrefabScan CI"
           git config user.email "actions@users.noreply.github.com"
           git add src/SewerScan.Infrastructure/Parsers/SewerProjectParser.cs
-          if git diff --cached --quiet; then
-            echo "No source changes to commit"
-          else
-            git commit -m "fix: prefer network family in profile resolver"
-            git push origin HEAD:sync/prefabscan-4.2.2
-          fi
+          if (-not (git diff --cached --quiet)) {
+            git commit -m "fix: recover repeated displaced PZT elevation pairs"
+            git push origin HEAD:fix/prefabscan-4.2.4-work
+          }
+
+      - name: Run application tests
+        run: dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --configuration Release
+
+      - name: Run domain tests
+        run: dotnet test tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj --configuration Release
+
+      - name: Publish Windows x64
+        run: dotnet publish src/SewerScan.UI/SewerScan.UI.csproj -c Release -r win-x64 --self-contained true -o publish/PrefabScan_4.2.4
+
+      - name: Package ZIP
+        shell: pwsh
+        run: Compress-Archive -Path publish/PrefabScan_4.2.4/* -DestinationPath PrefabScan_4.2.4_Windows_x64.zip -Force
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: PrefabScan_4.2.4_Windows_x64
+          path: PrefabScan_4.2.4_Windows_x64.zip
