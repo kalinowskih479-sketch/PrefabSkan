@@ -863,6 +863,23 @@ namespace SewerScan.Infrastructure.Parsers
                 {
                     var dx = Math.Abs(pair.X - anchor.X);
                     var dy = Math.Abs(pair.Y - anchor.Y);
+
+                    // 4.2.4 Batorego: tiled OCR often returns each rendered level two to four
+                    // times. That repetition is useful confidence evidence. In the real PZT the
+                    // repeated level stack can be displaced 70-90 px from the D/S label, so the
+                    // old 32 px vertical-pair gate discarded otherwise unambiguous 62,25/60,58
+                    // pairs. Only widen the ownership window when BOTH levels are independently
+                    // repeated near the pair; ordinary one-off numbers keep the strict gate.
+                    var repeatedGround = numeric.Count(n =>
+                        Math.Abs(n.Value - pair.Ground) < 0.001 &&
+                        Math.Abs(n.X - pair.X) <= 105 &&
+                        Math.Abs(n.Y - pair.Y) <= 85) >= 2;
+                    var repeatedInvert = numeric.Count(n =>
+                        Math.Abs(n.Value - pair.Invert) < 0.001 &&
+                        Math.Abs(n.X - pair.X) <= 105 &&
+                        Math.Abs(n.Y - pair.Y) <= 85) >= 2;
+                    var strongRepeatedPair = repeatedGround && repeatedInvert;
+
                     if (pair.Horizontal)
                     {
                         if (dx > 85 || dy > 18)
@@ -870,7 +887,9 @@ namespace SewerScan.Infrastructure.Parsers
                     }
                     else
                     {
-                        if (dx > 32 || dy > 58)
+                        var maxDx = strongRepeatedPair ? 95 : 32;
+                        var maxDy = strongRepeatedPair ? 75 : 58;
+                        if (dx > maxDx || dy > maxDy)
                             continue;
                     }
 
