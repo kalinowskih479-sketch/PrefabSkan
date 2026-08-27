@@ -6,31 +6,14 @@ on:
       - fix/prefabscan-4.2.5
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   test-build:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - name: Apply 4.2.5 parser patch
-        run: python tools/patch_425.py
-      - name: Persist parser patch
-        shell: pwsh
-        run: |
-          git config user.name "PrefabScan CI"
-          git config user.email "actions@users.noreply.github.com"
-          git add src/SewerScan.Infrastructure/Parsers/SewerProjectParser.cs
-          if (-not (git diff --cached --quiet)) {
-            git commit -m "feat: recover numeric-only profile node identifiers"
-            git push origin HEAD:fix/prefabscan-4.2.5
-          }
       - name: Run application tests
         run: dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --configuration Release
       - name: Run domain tests
