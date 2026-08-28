@@ -14,32 +14,25 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - name: Prove safe fixture reconstruction
+      - name: Rebuild storm fixture
         shell: pwsh
         run: |
-          $hex = (Get-Content 'Reference/BatoregoPayload/transport-smoke.hex' -Raw).Trim()
-          $bytes = New-Object byte[] ($hex.Length / 2)
-          for ($i = 0; $i -lt $bytes.Length; $i++) { $bytes[$i] = [Convert]::ToByte($hex.Substring($i * 2, 2), 16) }
-          [IO.File]::WriteAllBytes('Reference/BatoregoPayload/transport-smoke.pdf', $bytes)
-          $rebuilt = [IO.File]::ReadAllBytes('Reference/BatoregoPayload/transport-smoke.pdf')
-          $magic = [Text.Encoding]::ASCII.GetString($rebuilt, 0, 5)
-          $tail = [Text.Encoding]::ASCII.GetString($rebuilt)
-          Write-Host "Smoke fixture bytes: $($rebuilt.Length); magic: $magic"
-          if ($magic -ne '%PDF-') { throw 'Hex transport did not reconstruct PDF magic' }
-          if (!$tail.Contains('%%EOF')) { throw 'Hex transport did not reconstruct PDF EOF' }
+          $parts = Get-ChildItem 'Reference/BatoregoPayload/storm.part*.b64' | Sort-Object Name
+          if ($parts.Count -ne 7) { throw "Expected 7 storm payload parts, got $($parts.Count)" }
+          $b64 = ($parts | ForEach-Object { (Get-Content $_.FullName -Raw).Trim() }) -join ''
+          $bytes = [Convert]::FromBase64String($b64)
+          $pdf = 'Reference/Batorego/Rys I_8 profil kanalizacja deszczowa.pdf'
+          [IO.File]::WriteAllBytes($pdf, $bytes)
+          $magic = [Text.Encoding]::ASCII.GetString($bytes, 0, 5)
+          $tail = [Text.Encoding]::ASCII.GetString($bytes, [Math]::Max(0,$bytes.Length-2048), [Math]::Min(2048,$bytes.Length))
+          Write-Host "Storm fixture rebuilt bytes: $($bytes.Length); magic: $magic"
+          if ($bytes.Length -ne 47823) { throw "Unexpected storm fixture size: $($bytes.Length)" }
+          if ($magic -ne '%PDF-') { throw 'Storm fixture is not a PDF' }
+          if (!$tail.Contains('%%EOF')) { throw 'Storm fixture has no EOF marker' }
       - name: Run application tests
         run: dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --configuration Release
       - name: Run domain tests
         run: dotnet test tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj --configuration Release
-      - name: Verify storm fixture
-        shell: pwsh
-        run: |
-          $pdf = 'Reference/Batorego/Rys I_8 profil kanalizacja deszczowa.pdf'
-          if (!(Test-Path $pdf)) { throw "Missing storm PDF fixture" }
-          $bytes = [IO.File]::ReadAllBytes($pdf)
-          $magic = [Text.Encoding]::ASCII.GetString($bytes, 0, 5)
-          Write-Host "Storm fixture bytes: $($bytes.Length); magic: $magic"
-          if ($magic -ne '%PDF-') { throw "Storm fixture is not a PDF" }
       - name: Run storm OCR benchmark
         shell: pwsh
         run: |
