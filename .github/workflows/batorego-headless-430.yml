@@ -24,3 +24,5 @@ jobs:
         run: dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --configuration Release
       - name: Run domain tests
         run: dotnet test tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj --configuration Release
+      - name: Build headless benchmark runner
+        run: dotnet build src/SewerScan.BenchmarkRunner/SewerScan.BenchmarkRunner.csproj --configuration Release
