@@ -14,15 +14,33 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - name: Verify Batorego payload
+      - name: Verify storm fixture
         shell: pwsh
         run: |
-          $parts = Get-ChildItem Reference/BatoregoPayload/*.b64 -ErrorAction Stop
-          Write-Host "Batorego payload parts: $($parts.Count)"
-          if ($parts.Count -lt 2) { throw "Batorego payload incomplete" }
+          $pdf = 'Reference/Batorego/Rys I_8 profil kanalizacja deszczowa.pdf'
+          if (!(Test-Path $pdf)) { throw "Missing storm PDF fixture" }
+          $bytes = [IO.File]::ReadAllBytes($pdf)
+          $magic = [Text.Encoding]::ASCII.GetString($bytes, 0, 5)
+          Write-Host "Storm fixture bytes: $($bytes.Length); magic: $magic"
+          if ($magic -ne '%PDF-') { throw "Storm fixture is not a PDF" }
       - name: Run application tests
         run: dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --configuration Release
       - name: Run domain tests
         run: dotnet test tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj --configuration Release
-      - name: Build headless benchmark runner
-        run: dotnet build src/SewerScan.BenchmarkRunner/SewerScan.BenchmarkRunner.csproj --configuration Release
+      - name: Run storm OCR benchmark
+        shell: pwsh
+        run: |
+          dotnet run --project src/SewerScan.BenchmarkRunner/SewerScan.BenchmarkRunner.csproj --configuration Release -- Reference/Batorego artifacts/batorego --storm-only --diagnostic-only
+      - name: Print benchmark summary
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path artifacts/batorego/Batorego_SUMMARY.md) { Get-Content artifacts/batorego/Batorego_SUMMARY.md }
+          if (Test-Path artifacts/batorego/Batorego_FATAL.txt) { Get-Content artifacts/batorego/Batorego_FATAL.txt }
+      - name: Upload Batorego diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: batorego-storm-diagnostics
+          path: artifacts/batorego
+          if-no-files-found: warn
