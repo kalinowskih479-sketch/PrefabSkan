@@ -1,0 +1,26 @@
+name: Batorego Headless 4.3.0
+
+on:
+  push:
+    branches:
+      - fix/prefabscan-4.3.0-headless-benchmark
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Verify Batorego payload
+        shell: pwsh
+        run: |
+          $parts = Get-ChildItem Reference/BatoregoPayload/*.b64 -ErrorAction Stop
+          Write-Host "Batorego payload parts: $($parts.Count)"
+          if ($parts.Count -lt 2) { throw "Batorego payload incomplete" }
+      - name: Run application tests
+        run: dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --configuration Release
+      - name: Run domain tests
+        run: dotnet test tests/SewerScan.Domain.Tests/SewerScan.Domain.Tests.csproj --configuration Release
