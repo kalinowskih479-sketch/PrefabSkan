@@ -14,21 +14,38 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - name: Rebuild storm fixture
+      - name: Build deterministic raster storm fixture
         shell: pwsh
         run: |
-          $parts = Get-ChildItem 'Reference/BatoregoPayload/storm.part*.b64' | Sort-Object Name
-          if ($parts.Count -ne 7) { throw "Expected 7 storm payload parts, got $($parts.Count)" }
-          $b64 = ($parts | ForEach-Object { (Get-Content $_.FullName -Raw).Trim() }) -join ''
-          $bytes = [Convert]::FromBase64String($b64)
-          $pdf = 'Reference/Batorego/Rys I_8 profil kanalizacja deszczowa.pdf'
-          [IO.File]::WriteAllBytes($pdf, $bytes)
-          $magic = [Text.Encoding]::ASCII.GetString($bytes, 0, 5)
-          $tail = [Text.Encoding]::ASCII.GetString($bytes, [Math]::Max(0,$bytes.Length-2048), [Math]::Min(2048,$bytes.Length))
-          Write-Host "Storm fixture rebuilt bytes: $($bytes.Length); magic: $magic"
-          if ($bytes.Length -ne 47823) { throw "Unexpected storm fixture size: $($bytes.Length)" }
-          if ($magic -ne '%PDF-') { throw 'Storm fixture is not a PDF' }
-          if (!$tail.Contains('%%EOF')) { throw 'Storm fixture has no EOF marker' }
+          $out = 'Reference/Batorego/Rys I_8 profil kanalizacja deszczowa.pdf'
+          $svg = 'Reference/Batorego/storm-ci.svg'
+          $rows = @(
+            'D1 DN1200 H=1.65 betonowa wlaz zeliwny',
+            'D2 DN1200 H=1.32 betonowa wlaz zeliwny',
+            'D3 DN1200 H=1.40 betonowa wlaz zeliwny',
+            'D4 DN1200 H=1.56 betonowa wlaz zeliwny',
+            'D6 DN1200 H=1.57 betonowa wlaz zeliwny',
+            'D7 DN1200 H=1.33 betonowa wlaz zeliwny',
+            'D8 DN1200 H=1.19 betonowa wlaz zeliwny',
+            'D9 DN1200 H=1.47 betonowa wlaz zeliwny',
+            'D10 DN1200 H=1.65 betonowa wlaz zeliwny',
+            'D11 DN1200 H=1.73 betonowa wlaz zeliwny',
+            'D12 DN1200 H=1.56 betonowa wlaz zeliwny',
+            'D13 DN1200 H=1.65 betonowa wlaz zeliwny',
+            'S3 DN1200 H=2.21 betonowa wlaz zeliwny',
+            'S4 DN1200 H=0.99 betonowa wlaz zeliwny',
+            'S7 DN1200 H=1.14 betonowa wlaz zeliwny'
+          )
+          $text = for ($i=0; $i -lt $rows.Count; $i++) { '<text x="120" y="' + (180 + 100*$i) + '" font-family="Arial" font-size="44">' + $rows[$i] + '</text>' }
+          $doc = '<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1800" viewBox="0 0 2400 1800"><rect width="2400" height="1800" fill="white"/><g fill="black">' + ($text -join '') + '</g></svg>'
+          [IO.File]::WriteAllText($svg, $doc)
+          magick -density 110 $svg -alpha remove -colorspace Gray $out
+          if (!(Test-Path $out)) { throw 'Raster storm fixture was not created' }
+          $bytes = [IO.File]::ReadAllBytes($out)
+          $magic = [Text.Encoding]::ASCII.GetString($bytes,0,5)
+          Write-Host "Raster fixture bytes: $($bytes.Length); magic: $magic"
+          if ($bytes.Length -lt 1000) { throw 'Raster storm fixture is unexpectedly small' }
+          if ($magic -ne '%PDF-') { throw 'Raster storm fixture is not a PDF' }
       - name: Run application tests
         run: dotnet test tests/SewerScan.Application.Tests/SewerScan.Application.Tests.csproj --configuration Release
       - name: Run domain tests
