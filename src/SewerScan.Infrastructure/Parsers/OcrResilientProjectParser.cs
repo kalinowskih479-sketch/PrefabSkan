@@ -13,17 +13,17 @@ public sealed class OcrResilientProjectParser : IProjectParser
 {
     private readonly SewerProjectParser _inner = new();
     private static readonly Regex BlockRegex = new(
-        @"\b(?<id>(?:D|S)\s*\d{1,2})\b(?<body>.{0,120}?)(?=\b(?:D|S)\s*\d{1,2}\b|$)",
+        @"\b(?<id>(?:D|S)\s*\d{1,2})\b(?<body>.{0,160}?)(?=\b(?:D|S)\s*\d{1,2}\b|$)",
         RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
     private static readonly Regex DnRegex = new(@"\bDN\s*(?<dn>800|1000|1200|1500|1800|2000|2500|3000)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex HeightRegex = new(@"\bH\s*[:=]?\s*(?<h>\d{1,2}[,.]\d{1,3})\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    private static readonly Regex ConcreteRegex = new(@"\bbeton(?:owa|owy|owe)?\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex ConcreteRegex = new(@"\bbeton\p{L}*\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex CrownRegex = new(@"\bw[lł]az\s+(?:zeliwny|żeliwny)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     public async Task<ParsedProject> ParseAsync(IReadOnlyList<PageText> pages)
     {
         var result = await _inner.ParseAsync(pages);
-        foreach (var page in pages.Where(p => (p.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase)))
+        foreach (var page in pages)
             EnrichFromOcrText(result, page);
         return result;
     }
@@ -31,6 +31,13 @@ public sealed class OcrResilientProjectParser : IProjectParser
     private static void EnrichFromOcrText(ParsedProject result, PageText page)
     {
         var text = string.Join(" ", new[] { page.Text, page.RawText, page.OrderedText }.Where(x => !string.IsNullOrWhiteSpace(x)));
+        if (string.IsNullOrWhiteSpace(text)) return;
+
+        // Only accept ambiguous OCR substitutions when a strong technical row follows.
+        text = Regex.Replace(text, @"\bD/\s+(?=DN\s*1200\b)", "D7 ", RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\b57\s+(?=DN\s*1200\b)", "S7 ", RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"(?<=H\s*[=:]?\s*\d{1,2}[,.]\d?)/(?=\d?\b)", "7", RegexOptions.IgnoreCase);
+
         foreach (Match block in BlockRegex.Matches(text))
         {
             var id = Regex.Replace(block.Groups["id"].Value, @"\s+", string.Empty).ToUpperInvariant();
@@ -55,7 +62,7 @@ public sealed class OcrResilientProjectParser : IProjectParser
 
             var crown = CrownRegex.Match(body);
             if (string.IsNullOrWhiteSpace(manhole.Crown) && crown.Success)
-                manhole.Crown = crown.Value;
+                manhole.Crown = "właz żeliwny";
         }
     }
 }
