@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using SewerScan.Application.DTO;
 using SewerScan.Application.Interfaces;
 using SewerScan.Application.Models;
 
