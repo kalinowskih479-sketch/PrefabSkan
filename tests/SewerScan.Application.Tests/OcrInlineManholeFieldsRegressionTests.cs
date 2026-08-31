@@ -30,7 +30,7 @@ public class OcrInlineManholeFieldsRegressionTests
         Assert.Equal(1200, d7.DiameterMm);
         Assert.Equal(1.33, d7.HeightM);
         Assert.Equal("betonowa", d7.Type);
-        Assert.Contains("wlaz", d7.Crown ?? string.Empty, System.StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("właz żeliwny", d7.Crown);
     }
 
     [Fact]
