@@ -7,7 +7,7 @@ namespace SewerScan.Application.Tests;
 public class BatoregoBenchmarkContractTests
 {
     [Fact]
-    public void Benchmark_Accepts_Concrete_Manhole_With_CastIron_Cover_As_Batorego_Kineta_With_Cone()
+    public void Benchmark_Uses_Reference_Height_For_D7_And_Does_Not_Confuse_Structure_With_Crown()
     {
         var project = new ParsedProject();
         project.Manholes.Add(new ParsedManhole
@@ -15,8 +15,8 @@ public class BatoregoBenchmarkContractTests
             Identifier = "D7",
             DiameterMm = 1200,
             HeightM = 1.33,
-            Type = "betonowa",
-            Crown = "właz żeliwny"
+            Type = "KINETA",
+            Crown = "zwężka"
         });
 
         var score = BatoregoBenchmark.GetScore(project);
