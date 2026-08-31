@@ -27,7 +27,7 @@ if (missing.Length > 0)
 
 try
 {
-    var analyzer = new PdfAnalyzer(new PdfTextExtractor(), new SewerProjectParser());
+    var analyzer = new PdfAnalyzer(new PdfTextExtractor(), new OcrResilientProjectParser());
     var projects = new List<ParsedProject>();
     foreach (var file in files)
     {
