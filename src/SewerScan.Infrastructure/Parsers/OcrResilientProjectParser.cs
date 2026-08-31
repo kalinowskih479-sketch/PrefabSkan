@@ -36,7 +36,7 @@ public sealed class OcrResilientProjectParser : IProjectParser
         // Only accept ambiguous OCR substitutions when a strong technical row follows.
         text = Regex.Replace(text, @"\bD/\s+(?=DN\s*1200\b)", "D7 ", RegexOptions.IgnoreCase);
         text = Regex.Replace(text, @"\b57\s+(?=DN\s*1200\b)", "S7 ", RegexOptions.IgnoreCase);
-        text = Regex.Replace(text, @"(?<=H\s*[=:]?\s*\d{1,2}[,.]\d?)/(?=\d?\b)", "7", RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"(\bH\s*[=:]?\s*\d{1,2}[,.]\d?)/(?=\d?\b)", "${1}7", RegexOptions.IgnoreCase);
 
         foreach (Match block in BlockRegex.Matches(text))
         {
