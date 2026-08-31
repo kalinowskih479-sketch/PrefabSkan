@@ -10,7 +10,7 @@ public class OcrInlineManholeFieldsRegressionTests
     [Fact]
     public async Task Ocr_Profile_Recovers_Inline_Dn_Height_Type_And_Crown_When_Spatial_Window_Is_Fragmented()
     {
-        var parser = new SewerProjectParser();
+        var parser = new OcrResilientProjectParser();
         var page = new PageText
         {
             PageNumber = 1,
