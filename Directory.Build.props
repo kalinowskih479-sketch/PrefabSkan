@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <Version>4.2.7</Version>
+    <AssemblyVersion>4.2.7.0</AssemblyVersion>
+    <FileVersion>4.2.7.0</FileVersion>
+    <InformationalVersion>4.2.7</InformationalVersion>
+    <Product>PrefabScan</Product>
+    <Company>PrefabScan</Company>
+    <RepositoryUrl>https://github.com/kalinowskih479-sketch/PrefabSkan</RepositoryUrl>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>

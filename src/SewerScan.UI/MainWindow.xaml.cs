@@ -10,6 +10,7 @@ using SewerScan.Application.Services;
 using SewerScan.Infrastructure.Excel;
 using SewerScan.Infrastructure.Parsers;
 using SewerScan.Infrastructure.Pdf;
+using SewerScan.Shared.Utilities;
 
 namespace SewerScan.UI;
 
@@ -24,7 +25,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        // 4.1 unattended regression mode: RUN_BATOREGO_TEST.bat starts the application
+        // Unattended regression mode: RUN_BATOREGO_TEST.bat starts the application
         // with --benchmark, so the complete reference analysis begins automatically.
         if (Environment.GetCommandLineArgs().Any(a => string.Equals(a, "--benchmark", StringComparison.OrdinalIgnoreCase)))
         {
@@ -105,8 +106,8 @@ public partial class MainWindow : Window
             MessageBox.Show(
                 "Brakuje referencyjnych plików testowych obok programu:" + Environment.NewLine +
                 string.Join(Environment.NewLine, missing.Select(Path.GetFileName)) + Environment.NewLine + Environment.NewLine +
-                "Przebuduj rozwiązanie 4.1 — pliki Reference/Batorego powinny być kopiowane automatycznie do katalogu wyjściowego.",
-                "PrefabScan 4.2.2 - brak danych testowych",
+                $"Przebuduj rozwiązanie {ProductInfo.Version} — pliki Reference/Batorego powinny być kopiowane automatycznie do katalogu wyjściowego.",
+                $"{ProductInfo.DisplayName} - brak danych testowych",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
             return;
@@ -202,7 +203,7 @@ public partial class MainWindow : Window
                     File.WriteAllText(historyPath, "timestamp;version;id;dn;height;type;crown;extras" + Environment.NewLine, System.Text.Encoding.UTF8);
                 File.AppendAllText(
                     historyPath,
-                    $"{DateTime.Now:yyyy-MM-dd HH:mm:ss};4.1;{score.Found};{score.Dn};{score.Height};{score.Type};{score.Crown};{score.Extras}" + Environment.NewLine,
+                    $"{DateTime.Now:yyyy-MM-dd HH:mm:ss};{ProductInfo.Version};{score.Found};{score.Dn};{score.Height};{score.Type};{score.Crown};{score.Extras}" + Environment.NewLine,
                     System.Text.Encoding.UTF8);
 
                 var clipboardResult =
@@ -313,7 +314,7 @@ public partial class MainWindow : Window
     private static string BuildDiagnostics(ParsedProject project)
     {
         var summary = new System.Text.StringBuilder();
-        summary.AppendLine("PREFABSCAN 4.1 — RAPORT DIAGNOSTYCZNY");
+        summary.AppendLine($"{ProductInfo.DisplayName.ToUpperInvariant()} — RAPORT DIAGNOSTYCZNY");
         summary.AppendLine($"Typ zestawu: {project.DrawingType}");
         summary.AppendLine($"Dokumenty: {string.Join(" | ", project.SourceDocuments)}");
         summary.AppendLine();
