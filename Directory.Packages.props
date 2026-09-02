@@ -1,0 +1,17 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.30" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.30" />
+    <PackageVersion Include="PdfPig" Version="0.1.15" />
+    <PackageVersion Include="Docnet.Core" Version="2.6.0" />
+    <PackageVersion Include="Magick.NET-Q8-AnyCPU" Version="13.3.0" />
+    <PackageVersion Include="Tesseract" Version="5.2.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+    <PackageVersion Include="xunit" Version="2.5.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
+  </ItemGroup>
+</Project>

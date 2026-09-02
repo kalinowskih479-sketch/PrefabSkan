@@ -10,16 +10,16 @@
 	<ProjectReference Include="..\SewerScan.Domain\SewerScan.Domain.csproj" />
   </ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
 		<PrivateAssets>all</PrivateAssets>
 	  </PackageReference>
 	  <!-- Official PdfPig package. Replaces the old custom 1.7.0 build which failed on CAD xref tables. -->
-	  <PackageReference Include="PdfPig" Version="0.1.15" />
-	  <PackageReference Include="Docnet.Core" Version="2.6.0" />
+	  <PackageReference Include="PdfPig" />
+	  <PackageReference Include="Docnet.Core" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="13.2.1" />
-	  <PackageReference Include="Tesseract" Version="5.0.1" />
+	  <PackageReference Include="Magick.NET-Q8-AnyCPU" />
+	  <PackageReference Include="Tesseract" />
 	</ItemGroup>
 </Project>

@@ -1,0 +1,119 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "Microsoft.NET.Test.Sdk": {
+        "type": "Direct",
+        "requested": "[18.3.0, )",
+        "resolved": "18.3.0",
+        "contentHash": "xW3kXuWRQtgoxJp4J+gdhHSQyK+6Wb/AZDSd7lMvuMRYlZ1tnpkojyfZlWilB5G4dmZ0Y0ZxU/M23TlubndNkw==",
+        "dependencies": {
+          "Microsoft.CodeCoverage": "18.3.0",
+          "Microsoft.TestPlatform.TestHost": "18.3.0"
+        }
+      },
+      "xunit": {
+        "type": "Direct",
+        "requested": "[2.5.3, )",
+        "resolved": "2.5.3",
+        "contentHash": "VxYDiWSwrLxOJ3UEN+ZPrBybB0SFShQ1E6PjT65VdoKCJhorgerFznThjSwawRH/WAip73YnucDVsE8WRj/8KQ==",
+        "dependencies": {
+          "xunit.analyzers": "1.4.0",
+          "xunit.assert": "2.5.3",
+          "xunit.core": "[2.5.3]"
+        }
+      },
+      "xunit.runner.visualstudio": {
+        "type": "Direct",
+        "requested": "[2.5.3, )",
+        "resolved": "2.5.3",
+        "contentHash": "HFFL6O+QLEOfs555SqHii48ovVa4CqGYanY+B32BjLpPptdE+wEJmCFNXlLHdEOD5LYeayb9EroaUpydGpcybg=="
+      },
+      "Microsoft.CodeCoverage": {
+        "type": "Transitive",
+        "resolved": "18.3.0",
+        "contentHash": "23BNy/vziREC20Wwhb50K7+kZe0m07KlLWDQv4qjJ9tt3QjpDpDIqJFrhYHmMEo9xDkuSp55U/8h4bMF7MiB+g=="
+      },
+      "Microsoft.NETCore.Platforms": {
+        "type": "Transitive",
+        "resolved": "1.1.0",
+        "contentHash": "kz0PEW2lhqygehI/d6XsPCQzD7ff7gUJaVGPVETX611eadGsA3A877GdSlU0LRVMCTH/+P3o2iDTak+S08V2+A=="
+      },
+      "Microsoft.TestPlatform.ObjectModel": {
+        "type": "Transitive",
+        "resolved": "18.3.0",
+        "contentHash": "AEIEX2aWdPO9XbtR96eBaJxmXRD9vaI9uQ1T/JbPEKlTAZwYx0ZrMzKyULMdh/HH9Sg03kXCoN7LszQ90o6nPQ=="
+      },
+      "Microsoft.TestPlatform.TestHost": {
+        "type": "Transitive",
+        "resolved": "18.3.0",
+        "contentHash": "twmsoelXnp1uWMU3VGip9f0Jr1mZ0PZqgJdF35CIrdYgYrkHIJMV1m8uKyhcdjLdsQDESHAgkR7KhS9i1qpJag==",
+        "dependencies": {
+          "Microsoft.TestPlatform.ObjectModel": "18.3.0",
+          "Newtonsoft.Json": "13.0.3"
+        }
+      },
+      "NETStandard.Library": {
+        "type": "Transitive",
+        "resolved": "1.6.1",
+        "contentHash": "WcSp3+vP+yHNgS8EV5J7pZ9IRpeDuARBPN28by8zqff1wJQXm26PVU8L3/fYLBJVU7BtDyqNVWq2KlCVvSSR4A==",
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "1.1.0"
+        }
+      },
+      "Newtonsoft.Json": {
+        "type": "Transitive",
+        "resolved": "13.0.3",
+        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
+      },
+      "xunit.abstractions": {
+        "type": "Transitive",
+        "resolved": "2.0.3",
+        "contentHash": "pot1I4YOxlWjIb5jmwvvQNbTrZ3lJQ+jUGkGjWE3hEFM0l5gOnBWS+H3qsex68s5cO52g+44vpGzhAt+42vwKg=="
+      },
+      "xunit.analyzers": {
+        "type": "Transitive",
+        "resolved": "1.4.0",
+        "contentHash": "7ljnTJfFjz5zK+Jf0h2dd2QOSO6UmFizXsojv/x4QX7TU5vEgtKZPk9RvpkiuUqg2bddtNZufBoKQalsi7djfA=="
+      },
+      "xunit.assert": {
+        "type": "Transitive",
+        "resolved": "2.5.3",
+        "contentHash": "MK3HiBckO3vdxEdUxXZyyRPsBNPsC/nz6y1gj/UZIZkjMnsVQyZPU8yxS/3cjTchYcqskt/nqUOS5wmD8JezdQ==",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        }
+      },
+      "xunit.core": {
+        "type": "Transitive",
+        "resolved": "2.5.3",
+        "contentHash": "FE8yEEUkoMLd6kOHDXm/QYfX/dYzwc0c+Q4MQon6VGRwFuy6UVGwK/CFA5LEea+ZBEmcco7AEl2q78VjsA0j/w==",
+        "dependencies": {
+          "xunit.extensibility.core": "[2.5.3]",
+          "xunit.extensibility.execution": "[2.5.3]"
+        }
+      },
+      "xunit.extensibility.core": {
+        "type": "Transitive",
+        "resolved": "2.5.3",
+        "contentHash": "IjAQlPeZWXP89pl1EuOG9991GH1qgAL0rQfkmX2UV+PDenbYb7oBnQopL9ujE6YaXxgaQazp7lFjsDyyxD6Mtw==",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "xunit.abstractions": "2.0.3"
+        }
+      },
+      "xunit.extensibility.execution": {
+        "type": "Transitive",
+        "resolved": "2.5.3",
+        "contentHash": "w9eGCHl+gJj1GzZSf0VTzYPp/gv4fiUDkr+yR7/Wv9/ucO2CHltGg2TnyySLFjzekkjuxVJZUE+tZyDNzryJFw==",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "xunit.extensibility.core": "[2.5.3]"
+        }
+      },
+      "sewerscan.domain": {
+        "type": "Project"
+      }
+    }
+  }
+}
