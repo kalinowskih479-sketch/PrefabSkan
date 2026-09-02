@@ -23,7 +23,6 @@ namespace SewerScan.Infrastructure.OCR;
 /// </summary>
 internal static class OcrFallbackExtractor
 {
-    private const string OcrVersion = "prefabscan-ocr-4.1-profile";
     private const int RenderMaxDimension = 6200;
     private const int TileSize = 1700;
     private const int TileOverlap = 180;
@@ -40,7 +39,7 @@ internal static class OcrFallbackExtractor
 
     private sealed class CacheDocument
     {
-        public string Version { get; set; } = OcrVersion;
+        public string Version { get; set; } = OcrCacheIdentity.Identity;
         public List<CachePage> Pages { get; set; } = new();
     }
 
@@ -541,7 +540,7 @@ internal static class OcrFallbackExtractor
         using var sha = SHA256.Create();
         using var stream = File.OpenRead(filePath);
         var hash = Convert.ToHexString(sha.ComputeHash(stream));
-        return Path.Combine(cacheRoot, $"{OcrVersion}_{hash}.json");
+        return OcrCacheIdentity.CreatePath(cacheRoot, hash);
     }
 
     private static bool TryLoadCache(string filePath, out List<PageText> pages)
@@ -552,7 +551,7 @@ internal static class OcrFallbackExtractor
             var path = GetCachePath(filePath);
             if (!File.Exists(path)) return false;
             var doc = JsonSerializer.Deserialize<CacheDocument>(File.ReadAllText(path));
-            if (doc == null || doc.Version != OcrVersion || doc.Pages.Count == 0) return false;
+            if (doc == null || doc.Version != OcrCacheIdentity.Identity || doc.Pages.Count == 0) return false;
             pages = doc.Pages.Select(p =>
             {
                 var pt = new PageText
