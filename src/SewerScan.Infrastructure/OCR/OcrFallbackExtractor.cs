@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -72,8 +71,8 @@ internal static class OcrFallbackExtractor
             if (TryLoadCache(filePath, out var cached))
                 return cached;
 
-            var tessdata = EnsureTessdata();
-            var languages = File.Exists(Path.Combine(tessdata, "pol.traineddata")) ? "pol+eng" : "eng";
+            var tessdata = OcrModelStore.Resolve(AppContext.BaseDirectory);
+            const string languages = "pol+eng";
 
             using var engine = new TesseractEngine(tessdata, languages, EngineMode.Default);
             engine.SetVariable("preserve_interword_spaces", "1");
@@ -533,29 +532,6 @@ internal static class OcrFallbackExtractor
         if (data.Length == 0) return 1;
         var mid = data.Length / 2;
         return data.Length % 2 == 0 ? (data[mid - 1] + data[mid]) / 2.0 : data[mid];
-    }
-
-    private static string EnsureTessdata()
-    {
-        var path = Path.Combine(AppContext.BaseDirectory, "tessdata");
-        Directory.CreateDirectory(path);
-        EnsureLanguage(path, "eng");
-        try { EnsureLanguage(path, "pol"); } catch (Exception ex) { Debug.WriteLine($"Polish tessdata unavailable: {ex.Message}"); }
-        return path;
-    }
-
-    private static void EnsureLanguage(string tessdataPath, string language)
-    {
-        var target = Path.Combine(tessdataPath, language + ".traineddata");
-        if (File.Exists(target) && new FileInfo(target).Length > 100_000) return;
-
-        var url = $"https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/main/{language}.traineddata";
-        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(45) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("PrefabScan/3.2");
-        var bytes = client.GetByteArrayAsync(url).GetAwaiter().GetResult();
-        if (bytes.Length < 100_000)
-            throw new InvalidDataException($"Pobrany model OCR {language} jest nieprawidłowy.");
-        File.WriteAllBytes(target, bytes);
     }
 
     private static string GetCachePath(string filePath)
