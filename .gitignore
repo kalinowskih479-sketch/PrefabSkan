@@ -1,8 +1,11 @@
 /.vs/
-/bin/
-/obj/
+**/bin/
+**/obj/
 *.user
 *.suo
 *.userosscache
 *.sln.metaproj
 .idea/
+*.pdb
+PrefabScan_*_Windows_x64.zip
+tessdata/*.traineddata

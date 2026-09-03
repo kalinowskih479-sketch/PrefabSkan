@@ -7,6 +7,7 @@
     <Product>PrefabScan</Product>
     <Company>PrefabScan</Company>
     <RepositoryUrl>https://github.com/kalinowskih479-sketch/PrefabSkan</RepositoryUrl>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 </Project>

@@ -11,7 +11,7 @@
 	<ProjectReference Include="..\SewerScan.Infrastructure\SewerScan.Infrastructure.csproj" />
 	<ProjectReference Include="..\SewerScan.Shared\SewerScan.Shared.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' != 'Release'">
     <Content Include="..\..\Reference\Batorego\*.pdf">
       <Link>Reference\Batorego\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
