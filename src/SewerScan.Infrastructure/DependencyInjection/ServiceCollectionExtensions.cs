@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SewerScan.Infrastructure.Persistence;
@@ -20,7 +20,25 @@ public static class ServiceCollectionExtensions
 
         // Register other infrastructure services (repositories, OCR, AI, logging adapters etc.)
         // PDF analysis
-        services.AddSingleton<ITextExtractor, PdfTextExtractor>();
+        // Use Windows-capable extractor when running UI (supports OCR fallback)
+        // Register the WindowsPdfTextExtractor from UI assembly if available; otherwise fall back to PdfTextExtractor
+        try
+        {
+            // attempt to resolve type by name to avoid hard dependency from Infrastructure to UI
+            var t = Type.GetType("SewerScan.UI.Pdf.WindowsPdfTextExtractor, SewerScan.UI");
+            if (t != null && typeof(SewerScan.Application.Interfaces.ITextExtractor).IsAssignableFrom(t))
+            {
+                services.AddSingleton(typeof(SewerScan.Application.Interfaces.ITextExtractor), t);
+            }
+            else
+            {
+                services.AddSingleton<ITextExtractor, PdfTextExtractor>();
+            }
+        }
+        catch
+        {
+            services.AddSingleton<ITextExtractor, PdfTextExtractor>();
+        }
         services.AddSingleton<IProjectParser, SewerProjectParser>();
         // Application service - PdfAnalyzer is in Application assembly
         services.AddSingleton<IPdfAnalyzer, PdfAnalyzer>();

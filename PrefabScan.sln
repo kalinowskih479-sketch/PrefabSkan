@@ -1,0 +1,54 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SewerScan.UI", "src\SewerScan.UI\SewerScan.UI.csproj", "{CD70AFF4-B841-4597-9F77-15DA496E3295}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SewerScan.Domain", "src\SewerScan.Domain\SewerScan.Domain.csproj", "{A61264DD-CABD-48DD-8052-FB6460BE9012}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SewerScan.Application", "src\SewerScan.Application\SewerScan.Application.csproj", "{A81F7D4F-3BF8-4026-B427-1888E80DE497}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SewerScan.Infrastructure", "src\SewerScan.Infrastructure\SewerScan.Infrastructure.csproj", "{38E168BF-5846-4C9A-ACF2-8F82AB2B13C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SewerScan.Shared", "src\SewerScan.Shared\SewerScan.Shared.csproj", "{ED24D571-B886-4A95-9193-500B648DD199}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SewerScan.Application.Tests", "tests\SewerScan.Application.Tests\SewerScan.Application.Tests.csproj", "{8BD85F65-9B8F-4940-8CAF-656CF5519F40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SewerScan.Domain.Tests", "tests\SewerScan.Domain.Tests\SewerScan.Domain.Tests.csproj", "{83B1DF1C-3B71-42D1-8F98-08F2E66C48F4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A61264DD-CABD-48DD-8052-FB6460BE9012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A61264DD-CABD-48DD-8052-FB6460BE9012}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A61264DD-CABD-48DD-8052-FB6460BE9012}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A61264DD-CABD-48DD-8052-FB6460BE9012}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A81F7D4F-3BF8-4026-B427-1888E80DE497}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A81F7D4F-3BF8-4026-B427-1888E80DE497}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A81F7D4F-3BF8-4026-B427-1888E80DE497}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A81F7D4F-3BF8-4026-B427-1888E80DE497}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38E168BF-5846-4C9A-ACF2-8F82AB2B13C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38E168BF-5846-4C9A-ACF2-8F82AB2B13C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38E168BF-5846-4C9A-ACF2-8F82AB2B13C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38E168BF-5846-4C9A-ACF2-8F82AB2B13C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED24D571-B886-4A95-9193-500B648DD199}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED24D571-B886-4A95-9193-500B648DD199}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED24D571-B886-4A95-9193-500B648DD199}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED24D571-B886-4A95-9193-500B648DD199}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD70AFF4-B841-4597-9F77-15DA496E3295}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD70AFF4-B841-4597-9F77-15DA496E3295}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD70AFF4-B841-4597-9F77-15DA496E3295}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD70AFF4-B841-4597-9F77-15DA496E3295}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BD85F65-9B8F-4940-8CAF-656CF5519F40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BD85F65-9B8F-4940-8CAF-656CF5519F40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BD85F65-9B8F-4940-8CAF-656CF5519F40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BD85F65-9B8F-4940-8CAF-656CF5519F40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83B1DF1C-3B71-42D1-8F98-08F2E66C48F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83B1DF1C-3B71-42D1-8F98-08F2E66C48F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83B1DF1C-3B71-42D1-8F98-08F2E66C48F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83B1DF1C-3B71-42D1-8F98-08F2E66C48F4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

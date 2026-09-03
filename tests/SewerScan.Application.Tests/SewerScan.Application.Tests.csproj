@@ -3,15 +3,17 @@
 	<TargetFramework>net10.0</TargetFramework>
 	<IsPackable>false</IsPackable>
 	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
-	<PackageReference Include="xunit" Version="2.5.3" />
-	<PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+	<PackageReference Include="Microsoft.NET.Test.Sdk" />
+	<PackageReference Include="xunit" />
+	<PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
   <ItemGroup>
 	<ProjectReference Include="..\..\src\SewerScan.Application\SewerScan.Application.csproj" />
 	<ProjectReference Include="..\..\src\SewerScan.Domain\SewerScan.Domain.csproj" />
 	<ProjectReference Include="..\..\src\SewerScan.Infrastructure\SewerScan.Infrastructure.csproj" />
+	<ProjectReference Include="..\..\src\SewerScan.Shared\SewerScan.Shared.csproj" />
   </ItemGroup>
 </Project>

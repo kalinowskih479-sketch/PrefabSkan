@@ -1,7 +1,7 @@
-using System.Windows;
+﻿using System.Windows;
 
 namespace SewerScan.UI;
 
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
 }

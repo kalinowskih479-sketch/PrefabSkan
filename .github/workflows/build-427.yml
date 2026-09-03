@@ -1,0 +1,54 @@
+name: Build PrefabScan 4.2.7
+
+on:
+  push:
+    branches: [main, 'stabilize/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-build-package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      - name: Restore locked dependencies
+        run: dotnet restore PrefabScan.sln --locked-mode -r win-x64
+      - name: Test Release build
+        run: dotnet test PrefabScan.sln -c Release --no-restore
+      - name: Acquire pinned OCR models
+        shell: pwsh
+        run: ./tools/Get-OcrModels.ps1 -Destination publish/tessdata
+      - name: Publish Windows x64
+        run: dotnet publish src/SewerScan.UI/SewerScan.UI.csproj -c Release -r win-x64 --self-contained true --no-restore -p:DebugType=None -p:DebugSymbols=false -o publish/app
+      - name: Stage only Windows x64 release files
+        shell: pwsh
+        run: |
+          robocopy publish/app publish/release /E /XD x86
+          if ($LASTEXITCODE -ge 8) { exit $LASTEXITCODE }
+          exit 0
+      - name: Add OCR models to publish directory
+        shell: pwsh
+        run: Move-Item -LiteralPath publish/tessdata -Destination publish/release/tessdata
+      - name: Validate release contents
+        shell: pwsh
+        run: ./tools/Test-ReleaseContents.ps1 -PublishDirectory publish/release -ExpectedVersion 4.2.7
+      - name: Create ZIP and SHA-256
+        shell: pwsh
+        run: |
+          Compress-Archive -Path publish/release/* -DestinationPath PrefabScan_4.2.7_Windows_x64.zip -Force
+          (Get-FileHash -Algorithm SHA256 PrefabScan_4.2.7_Windows_x64.zip).Hash + '  PrefabScan_4.2.7_Windows_x64.zip' | Set-Content PrefabScan_4.2.7_Windows_x64.zip.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PrefabScan_4.2.7_Windows_x64
+          path: |
+            PrefabScan_4.2.7_Windows_x64.zip
+            PrefabScan_4.2.7_Windows_x64.zip.sha256
+          if-no-files-found: error

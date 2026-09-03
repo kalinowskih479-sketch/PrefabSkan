@@ -1,3 +1,3 @@
-namespace SewerScan.Application.Interfaces;
+﻿namespace SewerScan.Application.Interfaces;
 
 public interface IApplicationMarker { }
