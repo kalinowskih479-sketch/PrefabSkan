@@ -24,6 +24,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Title = $"{ProductInfo.DisplayName} — Geometry Table Resolver";
 
         // Unattended regression mode: RUN_BATOREGO_TEST.bat starts the application
         // with --benchmark, so the complete reference analysis begins automatically.

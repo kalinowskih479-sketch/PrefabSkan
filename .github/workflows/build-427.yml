@@ -28,6 +28,9 @@ jobs:
         run: ./tools/Get-OcrModels.ps1 -Destination publish/tessdata
       - name: Publish Windows x64
         run: dotnet publish src/SewerScan.UI/SewerScan.UI.csproj -c Release -r win-x64 --self-contained true --no-restore -p:DebugType=None -p:DebugSymbols=false -o publish/app
+      - name: Verify application window version
+        shell: pwsh
+        run: ./tools/Test-WindowTitle.ps1 -ApplicationPath publish/app/SewerScan.UI.exe
       - name: Stage only Windows x64 release files
         shell: pwsh
         run: |
