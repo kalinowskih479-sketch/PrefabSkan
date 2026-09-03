@@ -698,7 +698,7 @@ public class PrefabScan39GeometryFirstTests
 
         var result = await parser.ParseAsync(new[] { page });
 
-        Assert.All(result.Manholes.Where(m => m.Identifier.StartsWith("D")),
+        Assert.All(result.Manholes.Where(m => m.Identifier?.StartsWith("D") == true),
             m => Assert.Null(m.DiameterMm));
     }
 }

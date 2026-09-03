@@ -3011,7 +3011,7 @@ namespace SewerScan.Infrastructure.Parsers
                     $"Transitions:{transitionsStr};" +
                     $"RawDesc:{rawMatch}";
                 // Try to find existing manhole by identifier on same page
-                ParsedManhole existing = null;
+                ParsedManhole? existing = null;
                 if (!string.IsNullOrWhiteSpace(id))
                 {
                     existing = result.Manholes.FirstOrDefault(h =>

@@ -1,27 +1,37 @@
-﻿# PrefabScan 2.1
+# PrefabScan 4.2.7
 
-Wersja 2.1 jest większym pakietem naprawczym po testach OCR 2.0/2.0.1.
+PrefabScan analizuje dokumentację kanalizacyjną PDF i eksportuje zestawienie elementów do XLSX. Wydanie 4.2.7 stabilizuje dystrybucję i OCR bez zmiany reguł biznesowych parsera.
 
-## Najważniejsze zmiany
+## Wymagania i kompilacja
 
-- normalizacja oznaczeń OCR, np. `S08 -> S8`;
-- odrzucanie niepotwierdzonych wysokich oznaczeń OCR typowych dla szumu (`S95` itp.);
-- zachowanie poprawionego odczytu rzędnych 2- i 3-cyfrowych oraz obliczania wysokości;
-- odzyskiwanie DN studni z rozdzielonych przez OCR tokenów `Ø + 1200` i `DN + 1200` na profilach/detalach;
-- przestrzenne łączenie materiału i średnicy rury, np. `PVC` + `200`, `PP` + `300`;
-- normalizacja typowych błędów OCR `PYC/P¥C -> PVC`;
-- przejścia szczelne są przypisywane lokalnie do studni, a nie globalnie do całej strony;
-- nowa wersja cache OCR `2.1.0`, aby nie używać starszych wyników;
-- dodatkowe testy regresyjne dla oznaczeń OCR, rzędnych i przejść.
+- Windows x64;
+- .NET SDK 10;
+- PowerShell 7 do skryptów wydania.
 
-## Uruchomienie
+```powershell
+dotnet restore PrefabScan.sln --locked-mode -r win-x64
+dotnet test PrefabScan.sln -c Release --no-restore
+dotnet build PrefabScan.sln -c Release --no-restore
+```
 
-1. Otwórz `PrefabScan.sln`.
-2. Ustaw `SewerScan.UI` jako projekt startowy.
-3. `Ctrl+Shift+B`.
-4. Przy 0 błędów: `Ctrl+F5`.
-5. Wybierz PZT + profile i uruchom analizę zestawu.
+## OCR offline
 
-## Ważne
+Program nigdy nie pobiera modeli podczas działania. Pakiet wydania zawiera zweryfikowane pliki `tessdata/eng.traineddata` i `tessdata/pol.traineddata`.
 
-PrefabScan nie zgaduje typu studni, DN ani zwieńczenia, jeśli dokumentacja nie daje wystarczającego lokalnego dowodu. Niepewne dane pozostają puste zamiast być przedstawione jako pewne.
+Jeżeli pojawi się komunikat `Brakuje modelu OCR: ...`, zamknij program i odtwórz oba modele w katalogu `tessdata` obok `SewerScan.UI.exe`:
+
+```powershell
+./tools/Get-OcrModels.ps1 -Destination ./tessdata
+```
+
+Skrypt pobiera modele z przypiętego commita oficjalnego repozytorium Tesseract i odrzuca pliki o niewłaściwej sumie SHA-256.
+
+## Cache
+
+Wyniki OCR są zapisywane w `%LOCALAPPDATA%\PrefabScan\ocr-cache`. Nazwa każdego wpisu zawiera wersję schematu i algorytmu. Usunięcie tego katalogu jest bezpieczne — wynik zostanie odtworzony przy następnej analizie.
+
+## Uruchomienie deweloperskie
+
+Otwórz `PrefabScan.sln`, ustaw `SewerScan.UI` jako projekt startowy, skompiluj rozwiązanie i uruchom bez debugowania. W aplikacji wybierz komplet dokumentów PZT i profili, a następnie uruchom analizę zestawu.
+
+PrefabScan pozostawia niepewne dane puste; nie zgaduje typu studni, DN ani zwieńczenia bez wystarczającego lokalnego dowodu w dokumentacji.
