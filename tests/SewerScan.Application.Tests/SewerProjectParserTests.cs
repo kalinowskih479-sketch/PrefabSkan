@@ -366,6 +366,21 @@ public class PrefabScan08RegressionTests
     }
 
     [Fact]
+    public async Task Text_Fallback_With_Inlet_Heading_Ignores_Unrelated_W_Prose()
+    {
+        var parser = new SewerProjectParser();
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "Tabela wpustów\nW0\nszerokość w 200 mm\nelementy w2 rzędach"
+        };
+
+        var result = await parser.ParseAsync(new[] { page });
+
+        Assert.Equal(new[] { "WP0" }, result.Inlets.Select(x => x.Identifier));
+    }
+
+    [Fact]
     public async Task Item_Stream_Recovers_Split_D20_D21_D22()
     {
         var parser = new SewerProjectParser();

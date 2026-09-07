@@ -24,8 +24,8 @@ namespace SewerScan.Infrastructure.Parsers
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex ShortInletRegex = new(
-            @"\bW\s*(?<id>\d{1,3}(?:[./-]\d+)*)\b",
-            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            @"^W\s*(?<id>[0-8])$",
+            RegexOptions.Compiled);
 
         private static readonly Regex DnRegex = new(
             @"\b(?<token>DN|D)\b[:=\s]*(?<value>[0-9]{1,4})\b",
@@ -92,9 +92,8 @@ namespace SewerScan.Infrastructure.Parsers
                 // Prefer spatial parsing whenever PdfPig supplied word coordinates.
                 // This prevents one manhole from absorbing pipe labels belonging to
                 // other manholes elsewhere on the same drawing.
-                var hasInletContext = raw.Contains("wpust", StringComparison.OrdinalIgnoreCase);
                 var spatialManholesParsed = ParseSpatialManholes(page, result, debug);
-                var spatialInletsParsed = ParseSpatialInlets(page, result, debug, hasInletContext);
+                var spatialInletsParsed = ParseSpatialInlets(page, result, debug);
                 var isOcrPage = (page.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase);
                 var hasUsableSpatialWords = page.Items != null && page.Items.Any(i =>
                     !string.IsNullOrWhiteSpace(i.Text) &&
@@ -129,7 +128,7 @@ namespace SewerScan.Infrastructure.Parsers
                     }
 
                     if (!spatialInletsParsed)
-                        ParseInlets(line, page.PageNumber, result, debug, hasInletContext);
+                        ParseInlets(line, page.PageNumber, result, debug);
 
                     ParseSeparators(
                         line,
@@ -273,8 +272,12 @@ namespace SewerScan.Infrastructure.Parsers
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex ExactSpatialInletRegex = new(
-            @"^W(?<long>P)?(?<number>\d{1,3}(?:[./-]\d+)*)$",
+            @"^WP(?<number>\d{1,3}(?:[./-]\d+)*)$",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static readonly Regex ExactSpatialShortInletRegex = new(
+            @"^W(?<number>[0-8])$",
+            RegexOptions.Compiled);
 
         private static readonly Regex SpatialManholeTypeRegex = new(
             @"\b(kinetow(?:a|e|y)?|osadnik(?:ow(?:a|e|y)?)?|rozpr[eę]żn(?:a|e|y)?|czyszczak(?:ow(?:a|e|y)?)?|tłocz(?:ny|na|ne)?)\b",
@@ -1146,7 +1149,7 @@ namespace SewerScan.Infrastructure.Parsers
             }
         }
 
-        private static bool ParseSpatialInlets(PageText page, ParsedProject result, StringBuilder debug, bool hasInletContext)
+        private static bool ParseSpatialInlets(PageText page, ParsedProject result, StringBuilder debug)
         {
             if (page.Items == null || page.Items.Count == 0)
                 return false;
@@ -1157,8 +1160,8 @@ namespace SewerScan.Infrastructure.Parsers
                 var token = CleanSpatialToken(item.Text);
                 var match = ExactSpatialInletRegex.Match(token);
                 if (!match.Success)
-                    continue;
-                if (!match.Groups["long"].Success && !hasInletContext)
+                    match = ExactSpatialShortInletRegex.Match(token);
+                if (!match.Success)
                     continue;
 
                 var identifier = "WP" + match.Groups["number"].Value;
@@ -2622,12 +2625,10 @@ namespace SewerScan.Infrastructure.Parsers
             string line,
             int pageNumber,
             ParsedProject result,
-            StringBuilder debug,
-            bool hasInletContext)
+            StringBuilder debug)
         {
             var matches = InletRegex.Matches(line).Cast<Match>();
-            if (hasInletContext)
-                matches = matches.Concat(ShortInletRegex.Matches(line).Cast<Match>());
+            matches = matches.Concat(ShortInletRegex.Matches(line).Cast<Match>());
 
             foreach (var iw in matches)
             {
