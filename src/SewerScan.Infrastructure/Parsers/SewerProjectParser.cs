@@ -23,6 +23,10 @@ namespace SewerScan.Infrastructure.Parsers
             @"\bWP\s*(?<id>\d{1,3}(?:[./-]\d+)*)\b",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        private static readonly Regex ShortInletRegex = new(
+            @"^W\s*(?<id>[0-8])$",
+            RegexOptions.Compiled);
+
         private static readonly Regex DnRegex = new(
             @"\b(?<token>DN|D)\b[:=\s]*(?<value>[0-9]{1,4})\b",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -270,6 +274,10 @@ namespace SewerScan.Infrastructure.Parsers
         private static readonly Regex ExactSpatialInletRegex = new(
             @"^WP(?<number>\d{1,3}(?:[./-]\d+)*)$",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static readonly Regex ExactSpatialShortInletRegex = new(
+            @"^W(?<number>[0-8])$",
+            RegexOptions.Compiled);
 
         private static readonly Regex SpatialManholeTypeRegex = new(
             @"\b(kinetow(?:a|e|y)?|osadnik(?:ow(?:a|e|y)?)?|rozpr[eę]żn(?:a|e|y)?|czyszczak(?:ow(?:a|e|y)?)?|tłocz(?:ny|na|ne)?)\b",
@@ -1151,6 +1159,8 @@ namespace SewerScan.Infrastructure.Parsers
             {
                 var token = CleanSpatialToken(item.Text);
                 var match = ExactSpatialInletRegex.Match(token);
+                if (!match.Success)
+                    match = ExactSpatialShortInletRegex.Match(token);
                 if (!match.Success)
                     continue;
 
@@ -2617,7 +2627,10 @@ namespace SewerScan.Infrastructure.Parsers
             ParsedProject result,
             StringBuilder debug)
         {
-            foreach (Match iw in InletRegex.Matches(line))
+            var matches = InletRegex.Matches(line).Cast<Match>();
+            matches = matches.Concat(ShortInletRegex.Matches(line).Cast<Match>());
+
+            foreach (var iw in matches)
             {
                 var id = "WP" + iw.Groups["id"].Value;
 
