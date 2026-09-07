@@ -20,7 +20,11 @@ namespace SewerScan.Infrastructure.Parsers
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex InletRegex = new(
-            @"\bW(?:P)?\s*(?<id>\d{1,3}(?:[./-]\d+)*)\b",
+            @"\bWP\s*(?<id>\d{1,3}(?:[./-]\d+)*)\b",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static readonly Regex ShortInletRegex = new(
+            @"\bW\s*(?<id>\d{1,3}(?:[./-]\d+)*)\b",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex DnRegex = new(
@@ -2617,7 +2621,11 @@ namespace SewerScan.Infrastructure.Parsers
             ParsedProject result,
             StringBuilder debug)
         {
-            foreach (Match iw in InletRegex.Matches(line))
+            var matches = InletRegex.Matches(line).Cast<Match>();
+            if (line.Contains("wpust", StringComparison.OrdinalIgnoreCase))
+                matches = matches.Concat(ShortInletRegex.Matches(line).Cast<Match>());
+
+            foreach (var iw in matches)
             {
                 var id = "WP" + iw.Groups["id"].Value;
 

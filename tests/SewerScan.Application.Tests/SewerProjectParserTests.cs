@@ -334,6 +334,21 @@ public class PrefabScan08RegressionTests
     }
 
     [Fact]
+    public async Task Text_Fallback_Does_Not_Treat_Separated_W_And_Number_As_An_Inlet()
+    {
+        var parser = new SewerProjectParser();
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "szerokość w 200 mm, elementy w2 rzędach"
+        };
+
+        var result = await parser.ParseAsync(new[] { page });
+
+        Assert.Empty(result.Inlets);
+    }
+
+    [Fact]
     public async Task Item_Stream_Recovers_Split_D20_D21_D22()
     {
         var parser = new SewerProjectParser();
