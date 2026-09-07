@@ -236,6 +236,23 @@ public class PrefabScan06RegressionTests
 
         Assert.Equal(new[] { "WP0", "WP1", "WP8" }, result.Inlets.Select(x => x.Identifier).OrderBy(x => x));
     }
+
+    [Fact]
+    public async Task Spatial_Mode_Does_Not_Treat_Ordinary_Lowercase_W_Number_As_An_Inlet()
+    {
+        var parser = new SewerProjectParser();
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "elementy w2 rzędach"
+        };
+
+        page.Items.Add(new TextItem { Text = "w2", X = 100, Y = 100, Width = 15, Height = 10 });
+
+        var result = await parser.ParseAsync(new[] { page });
+
+        Assert.Empty(result.Inlets);
+    }
 }
 
 public class PrefabScan07RegressionTests
@@ -325,7 +342,7 @@ public class PrefabScan08RegressionTests
         var page = new PageText
         {
             PageNumber = 1,
-            Text = "Tabela wpustów W0 W1 W8"
+            Text = "Tabela wpustów\nW0\nW1\nW8"
         };
 
         var result = await parser.ParseAsync(new[] { page });

@@ -92,8 +92,9 @@ namespace SewerScan.Infrastructure.Parsers
                 // Prefer spatial parsing whenever PdfPig supplied word coordinates.
                 // This prevents one manhole from absorbing pipe labels belonging to
                 // other manholes elsewhere on the same drawing.
+                var hasInletContext = raw.Contains("wpust", StringComparison.OrdinalIgnoreCase);
                 var spatialManholesParsed = ParseSpatialManholes(page, result, debug);
-                var spatialInletsParsed = ParseSpatialInlets(page, result, debug);
+                var spatialInletsParsed = ParseSpatialInlets(page, result, debug, hasInletContext);
                 var isOcrPage = (page.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase);
                 var hasUsableSpatialWords = page.Items != null && page.Items.Any(i =>
                     !string.IsNullOrWhiteSpace(i.Text) &&
@@ -128,7 +129,7 @@ namespace SewerScan.Infrastructure.Parsers
                     }
 
                     if (!spatialInletsParsed)
-                        ParseInlets(line, page.PageNumber, result, debug);
+                        ParseInlets(line, page.PageNumber, result, debug, hasInletContext);
 
                     ParseSeparators(
                         line,
@@ -272,7 +273,7 @@ namespace SewerScan.Infrastructure.Parsers
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex ExactSpatialInletRegex = new(
-            @"^W(?:P)?(?<number>\d{1,3}(?:[./-]\d+)*)$",
+            @"^W(?<long>P)?(?<number>\d{1,3}(?:[./-]\d+)*)$",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex SpatialManholeTypeRegex = new(
@@ -1145,7 +1146,7 @@ namespace SewerScan.Infrastructure.Parsers
             }
         }
 
-        private static bool ParseSpatialInlets(PageText page, ParsedProject result, StringBuilder debug)
+        private static bool ParseSpatialInlets(PageText page, ParsedProject result, StringBuilder debug, bool hasInletContext)
         {
             if (page.Items == null || page.Items.Count == 0)
                 return false;
@@ -1156,6 +1157,8 @@ namespace SewerScan.Infrastructure.Parsers
                 var token = CleanSpatialToken(item.Text);
                 var match = ExactSpatialInletRegex.Match(token);
                 if (!match.Success)
+                    continue;
+                if (!match.Groups["long"].Success && !hasInletContext)
                     continue;
 
                 var identifier = "WP" + match.Groups["number"].Value;
@@ -2619,10 +2622,11 @@ namespace SewerScan.Infrastructure.Parsers
             string line,
             int pageNumber,
             ParsedProject result,
-            StringBuilder debug)
+            StringBuilder debug,
+            bool hasInletContext)
         {
             var matches = InletRegex.Matches(line).Cast<Match>();
-            if (line.Contains("wpust", StringComparison.OrdinalIgnoreCase))
+            if (hasInletContext)
                 matches = matches.Concat(ShortInletRegex.Matches(line).Cast<Match>());
 
             foreach (var iw in matches)
