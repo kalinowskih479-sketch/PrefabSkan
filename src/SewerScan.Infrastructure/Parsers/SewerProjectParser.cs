@@ -106,10 +106,13 @@ namespace SewerScan.Infrastructure.Parsers
                     if (string.IsNullOrEmpty(line))
                         continue;
 
-                    ParsePipesByDiameter(line, page.PageNumber, result, debug);
-                    ParseMaterialDiameterPipes(line, page.PageNumber, result, debug);
-                    ParseLocalPipes(line, page.PageNumber, result, debug);
-                    ParseMaterialOnlyPipes(line, page.PageNumber, result, debug);
+                    if (!string.Equals(result.DrawingType, "TABELA WPUSTÓW", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ParsePipesByDiameter(line, page.PageNumber, result, debug);
+                        ParseMaterialDiameterPipes(line, page.PageNumber, result, debug);
+                        ParseLocalPipes(line, page.PageNumber, result, debug);
+                        ParseMaterialOnlyPipes(line, page.PageNumber, result, debug);
+                    }
 
                     // Legacy text-only mode remains as a fallback for PDFs without
                     // usable coordinates or for OCR-only pages.
@@ -297,7 +300,10 @@ namespace SewerScan.Infrastructure.Parsers
 
         private static string DetectDrawingType(IReadOnlyList<PageText> pages)
         {
-            var text = string.Join(" ", pages.Select(p => p.Text ?? string.Empty));
+            var text = string.Join(" ", pages
+                .SelectMany(page => new[] { page.Text, page.RawText, page.OrderedText })
+                .Where(stream => !string.IsNullOrWhiteSpace(stream))
+                .Distinct(StringComparer.Ordinal));
 
             // 4.1: explicit per-file hint supplied by PdfAnalyzer has absolute priority.
             var hint = Regex.Match(text, @"\[\[PREFABSCAN_DRAWING:(?<type>PZT|PROFIL)\]\]", RegexOptions.IgnoreCase);
@@ -309,6 +315,11 @@ namespace SewerScan.Infrastructure.Parsers
 
             if (Regex.IsMatch(text, @"PLAN\s+SYTUACYJNO|PROJEKT\s+ZAGOSPODAROWANIA\s+TERENU|\bPZT\b|\bPYT\b", RegexOptions.IgnoreCase))
                 return "PZT";
+
+            if (Regex.IsMatch(text, @"RZĘDNA\s+DNA\s+STUDZIENKI", RegexOptions.IgnoreCase) &&
+                Regex.IsMatch(text, @"RZĘDNA\s+WLOTU", RegexOptions.IgnoreCase) &&
+                Regex.IsMatch(text, @"DŁUGOŚĆ\s+PRZYKANALIKÓW", RegexOptions.IgnoreCase))
+                return "TABELA WPUSTÓW";
 
             return "NIEZNANY";
         }
