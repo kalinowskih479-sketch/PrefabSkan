@@ -214,6 +214,28 @@ public class PrefabScan06RegressionTests
         Assert.Contains(result.Inlets, x => x.Identifier == "WP2");
         Assert.Contains(result.Inlets, x => x.Identifier == "WP25");
     }
+
+    [Fact]
+    public async Task Spatial_Mode_Recognises_Short_W_Identifiers_As_Inlets()
+    {
+        var parser = new SewerProjectParser();
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "Tabela wpustów W0 W1 W8"
+        };
+
+        page.Items.AddRange(new[]
+        {
+            new TextItem { Text = "W0", X = 100, Y = 100, Width = 15, Height = 10 },
+            new TextItem { Text = "W1", X = 200, Y = 100, Width = 15, Height = 10 },
+            new TextItem { Text = "W8", X = 300, Y = 100, Width = 15, Height = 10 }
+        });
+
+        var result = await parser.ParseAsync(new[] { page });
+
+        Assert.Equal(new[] { "WP0", "WP1", "WP8" }, result.Inlets.Select(x => x.Identifier).OrderBy(x => x));
+    }
 }
 
 public class PrefabScan07RegressionTests
@@ -294,6 +316,21 @@ public class PrefabScan08RegressionTests
         Assert.Contains(result.Inlets, x => x.Identifier == "WP2");
         Assert.Contains(result.Inlets, x => x.Identifier == "WP25");
         Assert.DoesNotContain(result.Inlets, x => x.Identifier == "1" || x.Identifier == "2" || x.Identifier == "25");
+    }
+
+    [Fact]
+    public async Task Text_Fallback_Recognises_Short_W_Identifiers_As_Inlets()
+    {
+        var parser = new SewerProjectParser();
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "Tabela wpustów W0 W1 W8"
+        };
+
+        var result = await parser.ParseAsync(new[] { page });
+
+        Assert.Equal(new[] { "WP0", "WP1", "WP8" }, result.Inlets.Select(x => x.Identifier).OrderBy(x => x));
     }
 
     [Fact]

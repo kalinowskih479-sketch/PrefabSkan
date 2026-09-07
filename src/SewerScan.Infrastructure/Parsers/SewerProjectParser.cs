@@ -20,7 +20,7 @@ namespace SewerScan.Infrastructure.Parsers
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex InletRegex = new(
-            @"\bWP\s*(?<id>\d{1,3}(?:[./-]\d+)*)\b",
+            @"\bW(?:P)?\s*(?<id>\d{1,3}(?:[./-]\d+)*)\b",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex DnRegex = new(
@@ -268,7 +268,7 @@ namespace SewerScan.Infrastructure.Parsers
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex ExactSpatialInletRegex = new(
-            @"^WP(?<number>\d{1,3}(?:[./-]\d+)*)$",
+            @"^W(?:P)?(?<number>\d{1,3}(?:[./-]\d+)*)$",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex SpatialManholeTypeRegex = new(
