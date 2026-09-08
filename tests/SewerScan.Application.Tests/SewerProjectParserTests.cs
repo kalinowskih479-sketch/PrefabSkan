@@ -786,3 +786,69 @@ public class PrefabScan39GeometryFirstTests
             m => Assert.Null(m.DiameterMm));
     }
 }
+
+public class InletScheduleRegressionTests
+{
+    [Fact]
+    public async Task Inlet_Schedule_Is_Classified_From_Its_Column_Headers()
+    {
+        var parser = new SewerProjectParser();
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "Nr Głębokość wlotu Długość Średnica Spadek Nr wlotu\n" +
+                   "studzienki Rzędna dna studzienki Rzędna wlotu przykan. przykan. przykan. wpustu Rzędna wylotu przykan.\n" +
+                   "Długość przykanalików"
+        };
+
+        var result = await parser.ParseAsync(new[] { page });
+
+        Assert.Equal("TABELA WPUSTÓW", result.DrawingType);
+    }
+
+    [Fact]
+    public async Task Grabowka_Inlet_Schedule_Produces_All_Inlets_Without_False_Pipes()
+    {
+        var parser = new SewerProjectParser();
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "Nr Głębokość wlotu Długość Średnica Spadek Nr wlotu\n" +
+                   "studzienki Rzędna dna studzienki Rzędna wlotu przykan. przykan. przykan. wpustu Rzędna wylotu przykan.\n" +
+                   "D0 160,00 1,14 200 15 W0 159,99\n" +
+                   "D1 159,84 1,04 200 15 W1 159,81\n" +
+                   "D2 159,69 1,07 200 15 W2 159,65\n" +
+                   "D3 159,75 1,60 200 20 W3 159,65\n" +
+                   "D4 159,75 1,36 200 15 W4 159,70\n" +
+                   "D5 160,27 1,37 200 15 W5 159,65\n" +
+                   "D6 161,14 2,08 200 20 W6 159,65\n" +
+                   "W7 160,27 1,32\nW8 161,11 1,34\nDługość przykanalików",
+            RawText = "D0160 D1159 D2159 D3159 D4159 D5160 D6161"
+        };
+        page.Items.AddRange(Enumerable.Range(0, 9).Select(index =>
+            new TextItem { Text = $"W{index}", X = 100 + index * 20, Y = 100, Width = 12, Height = 10 }));
+
+        var result = await parser.ParseAsync(new[] { page });
+
+        Assert.Equal("TABELA WPUSTÓW", result.DrawingType);
+        Assert.Equal(Enumerable.Range(0, 9).Select(index => $"WP{index}"),
+            result.Inlets.Select(inlet => inlet.Identifier).OrderBy(identifier => identifier));
+        Assert.Empty(result.Pipes);
+    }
+
+    [Fact]
+    public async Task Inlet_Schedule_Is_Classified_When_Headers_Exist_Only_In_Ordered_Text()
+    {
+        var parser = new SewerProjectParser();
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "D0 W0",
+            OrderedText = "Rzędna dna studzienki Rzędna wlotu Długość przykanalików"
+        };
+
+        var result = await parser.ParseAsync(new[] { page });
+
+        Assert.Equal("TABELA WPUSTÓW", result.DrawingType);
+    }
+}
