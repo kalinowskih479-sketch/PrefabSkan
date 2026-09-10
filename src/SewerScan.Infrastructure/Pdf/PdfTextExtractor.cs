@@ -27,22 +27,28 @@ namespace SewerScan.Infrastructure.Pdf
             @"\b(?:KD|KS|WP)\s*[-.:/]?\s*\d{1,3}(?:[./-]\d+)*\b|\bD\s*[-.:/]?\s*\d{1,3}(?:[./-]\d+)*\b|\bSO\b|\b(?:DN|Ø|ø)\s*\d{2,4}\b",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        private static readonly Regex ProfileEngineeringCandidateRegex = new(
+            @"\b(?:KD|KS|K|WP)\s*[-.:/]?\s*\d{1,3}(?:[./-]\d+)*\b|\b(?:DN|Ø|ø)\s*\d{2,4}\b|\b(?:PVC-U|PVC|PE-HD|PEHD|HDPE|PP|PE)\b[^\r\n]{0,20}\d{2,4}\b",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         public Task<IReadOnlyList<PageText>> ExtractAsync(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
             var pigPages = TryExtractWithPdfPig(filePath, out var pigFailure);
             var pigUseful = pigPages.Count > 0 && pigPages.Any(IsUseful);
+            var pigNeedsProfileOcr = NeedsProfileOcrFallback(pigPages);
 
-            if (pigUseful)
+            if (pigUseful && !pigNeedsProfileOcr)
                 return Task.FromResult((IReadOnlyList<PageText>)pigPages);
 
             Debug.WriteLine($"[PdfTextExtractor] PdfPig returned no useful text for '{filePath}'. Trying PDFium/Docnet.");
 
             var pdfiumPages = TryExtractWithPdfium(filePath, out var pdfiumFailure);
             var pdfiumUseful = pdfiumPages.Count > 0 && pdfiumPages.Any(IsUseful);
+            var pdfiumNeedsProfileOcr = NeedsProfileOcrFallback(pdfiumPages);
 
-            if (pdfiumUseful)
+            if (pdfiumUseful && !pdfiumNeedsProfileOcr)
             {
                 // Preserve the fact that PdfPig failed/was empty in every page diagnostic.
                 foreach (var page in pdfiumPages)
@@ -94,6 +100,22 @@ namespace SewerScan.Infrastructure.Pdf
             throw new System.IO.InvalidDataException(
                 $"Nie można odczytać pliku PDF '{System.IO.Path.GetFileName(filePath)}' żadnym silnikiem. " +
                 $"PdfPig: {pigFailure ?? "brak danych"}. PDFium: {pdfiumFailure ?? "brak danych"}. OCR: {ocrFailure ?? "brak danych"}.");
+        }
+
+        internal static bool NeedsProfileOcrFallback(IReadOnlyList<PageText> pages)
+        {
+            if (pages == null || pages.Count == 0)
+                return false;
+
+            var identifiesProfile = pages.Any(page =>
+            {
+                var text = page.Text ?? string.Empty;
+                return Regex.IsMatch(text, @"\bPROFIL(?:E|U|OM)?\b", RegexOptions.IgnoreCase) &&
+                       Regex.IsMatch(text, @"\bKANALIZACJ", RegexOptions.IgnoreCase);
+            });
+            var hasProfileEngineeringCandidate = pages.Any(page =>
+                ProfileEngineeringCandidateRegex.IsMatch(page.Text ?? string.Empty));
+            return identifiesProfile && !hasProfileEngineeringCandidate;
         }
 
         private static List<PageText> TryExtractWithPdfPig(string filePath, out string? failure)
