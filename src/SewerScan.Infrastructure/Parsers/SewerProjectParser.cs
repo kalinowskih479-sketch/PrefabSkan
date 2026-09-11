@@ -940,11 +940,30 @@ namespace SewerScan.Infrastructure.Parsers
             // If the densest band is too small, fall back to the previous evidence-based strategy.
             if (selected.Count < 3)
             {
-                selected = candidates
+                // OCR from portrait pages containing a rotated landscape profile can stagger
+                // the node labels vertically. In that case there is no dense Y band, but the
+                // real nodes still have a pair of engineering elevations in the same X column.
+                // A sheet identifier in the title block does not have that support.
+                var columnSupported = candidates
+                    .Where(a => items.Count(i =>
+                    {
+                        if (!TryParseElevation(i.Text ?? string.Empty, out _)) return false;
+                        var cx = i.X + i.Width / 2.0;
+                        var cy = i.Y - i.Height / 2.0;
+                        return Math.Abs(cx - a.X) <= 70 && Math.Abs(cy - a.Y) >= 35;
+                    }) >= 2)
+                    .GroupBy(a => a.Identifier, StringComparer.OrdinalIgnoreCase)
+                    .Select(g => g.OrderByDescending(a => VisionEvidenceScore(a, items, "PROFIL")).First())
+                    .OrderBy(a => a.X)
+                    .ToList();
+
+                selected = columnSupported.Count >= 2
+                    ? columnSupported
+                    : candidates
                     .GroupBy(a => a.Identifier, StringComparer.OrdinalIgnoreCase)
                     .Select(g => g.OrderByDescending(a => VisionEvidenceScore(a, items, "PROFIL")).First())
                     .ToList();
-                debug.AppendLine($"4.1 profile node row: fallback, denseBand={best.Distinct}.");
+                debug.AppendLine($"4.2.8 profile node row: column fallback={columnSupported.Count}, denseBand={best.Distinct}.");
             }
             else
             {

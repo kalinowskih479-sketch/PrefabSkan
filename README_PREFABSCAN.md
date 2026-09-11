@@ -1,6 +1,6 @@
-# PrefabScan 4.2.7
+# PrefabScan 4.2.8
 
-PrefabScan analizuje dokumentację kanalizacyjną PDF i eksportuje zestawienie elementów do XLSX. Wydanie 4.2.7 stabilizuje dystrybucję i OCR bez zmiany reguł biznesowych parsera.
+PrefabScan analizuje dokumentację kanalizacyjną PDF i eksportuje zestawienie elementów do XLSX. Wydanie 4.2.8 poprawia łączenie oznaczeń studni z kolumnami danych na obróconych profilach OCR i odrzuca numery arkuszy z tabliczek rysunkowych.
 
 ## Wymagania i kompilacja
 

@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$ApplicationPath,
 
-    [string]$ExpectedTitle = 'PrefabScan 4.2.7 — Geometry Table Resolver'
+    [string]$ExpectedTitle = 'PrefabScan 4.2.8 — Geometry Table Resolver'
 )
 
 $resolvedApplication = (Resolve-Path -LiteralPath $ApplicationPath).Path

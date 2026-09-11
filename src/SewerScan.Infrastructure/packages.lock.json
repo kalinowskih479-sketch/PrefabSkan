@@ -327,7 +327,7 @@
       "sewerscan.application": {
         "type": "Project",
         "dependencies": {
-          "SewerScan.Domain": "[4.2.7, )"
+          "SewerScan.Domain": "[4.2.8, )"
         }
       },
       "sewerscan.domain": {

@@ -182,9 +182,11 @@ public partial class MainWindow : Window
 
             BindProject(_lastProject);
             ExportButton.IsEnabled = true;
-            _lastDiagnostics = BuildDiagnostics(_lastProject);
+            _lastDiagnostics = BuildDiagnostics(_lastProject, _benchmarkAutoRun);
             ExportDiagnosticsButton.IsEnabled = true;
-            BenchmarkText.Text = BatoregoBenchmark.BuildCompactSummary(_lastProject) + Environment.NewLine + BatoregoBenchmark.BuildCompactDetail(_lastProject);
+            BenchmarkText.Text = _benchmarkAutoRun
+                ? BatoregoBenchmark.BuildCompactSummary(_lastProject) + Environment.NewLine + BatoregoBenchmark.BuildCompactDetail(_lastProject)
+                : AnalysisResultSummary.BuildCompact(_lastProject);
 
             if (_benchmarkAutoRun)
             {
@@ -308,11 +310,11 @@ public partial class MainWindow : Window
             .ThenBy(p => p.Material)
             .ToList();
 
-        DiagnosticsBox.Text = BuildDiagnostics(project);
+        DiagnosticsBox.Text = BuildDiagnostics(project, _benchmarkAutoRun);
         _lastDiagnostics = DiagnosticsBox.Text;
     }
 
-    private static string BuildDiagnostics(ParsedProject project)
+    private static string BuildDiagnostics(ParsedProject project, bool includeBatoregoBenchmark)
     {
         var summary = new System.Text.StringBuilder();
         summary.AppendLine($"{ProductInfo.DisplayName.ToUpperInvariant()} — RAPORT DIAGNOSTYCZNY");
@@ -327,8 +329,11 @@ public partial class MainWindow : Window
         foreach (var m in project.Manholes.OrderBy(m => GetIdentifierSortKey(m.Identifier)))
             summary.AppendLine($"{m.Identifier,-10} {m.CompletenessPercent,3}%  pewność: {m.Confidence,-7}  braki: {m.MissingData}  uwagi: {m.ValidationIssues}");
 
-        summary.AppendLine();
-        summary.AppendLine(BatoregoBenchmark.BuildReport(project));
+        if (includeBatoregoBenchmark)
+        {
+            summary.AppendLine();
+            summary.AppendLine(BatoregoBenchmark.BuildReport(project));
+        }
         summary.AppendLine();
         summary.AppendLine("SUROWA DIAGNOSTYKA PARSERÓW:");
         summary.AppendLine(project.Diagnostics);
