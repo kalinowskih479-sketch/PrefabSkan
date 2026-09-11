@@ -48,6 +48,26 @@ namespace SewerScan.Infrastructure.Parsers
             @"\b(?<mat>PE-HD|PEHD|HDPE|PVC|PP|PE)\b[^\d\r\n]{0,6}[Øø]?\s*(?<diam>\d{2,4})\b",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        private static readonly Regex ProfilePvcUScheduleRegex = new(
+            @"\bPVC-U(?:[_\s-]*SDR\s*\d+[_\s]*(?:L|I|1))?\s*(?<diam>\d{2,4})\s*[x×]",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static readonly Regex ProfileBareDiameterBeforeSlopeRegex = new(
+            @"(?:^|\r?\n)[ \t]*(?<diam>160|200|225|250|300|315|400|500|600|630|800)[ \t]*(?:\r?\n)[ \t]*\d{1,2}(?:[,.]\d+)?[ \t]*%",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static readonly Regex ProfileConcreteScheduleRegex = new(
+            @"\bD[ \t]*(?<diam>\d{2,4})[ \t]*(?:\r?\n[ \t]*)?(?:beton(?:owe|owy|owa)?|żelbet(?:owe|owy|owa)?)\b",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static readonly Regex ProfileConcreteLegendRegex = new(
+            @"\b(?<diam>\d{2,4})[ \t]+(?:beton(?:owe|owy|owa)?|żelbet(?:owe|owy|owa)?)\b(?=[^\r\n]{0,80}WIPRO)",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static readonly Regex ProfileDiameterBeforeMaterialRegex = new(
+            @"\bD[zż]?[ \t]*(?<diam>\d{2,4})[ \t]*(?:mm)?[ \t]*(?<mat>PVC|PE-HD|PEHD|HDPE|PP|PE)\b",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         // Lokalne zwarte zapisy np. PVC200, PE110, P1PVC200
         private static readonly Regex LocalPipeCompactRegex = new(
             @"(?<prefix>P\d+)?(?<mat>PE-HD|PEHD|HDPE|PVC|PP|PE)\s*[Øø]?\s*(?<diam>\d{2,4})(?:\b|(?=i=|%))",
@@ -88,6 +108,13 @@ namespace SewerScan.Infrastructure.Parsers
                     .ToArray();
 
                 var debug = new StringBuilder();
+
+                if (string.Equals(result.DrawingType, "PROFIL", StringComparison.OrdinalIgnoreCase))
+                {
+                    ParseProfilePvcUSchedules(raw, page.PageNumber, result, debug);
+                    ParseProfileConcreteSchedules(raw, page.PageNumber, result, debug);
+                    ParseProfileDiameterBeforeMaterial(raw, page.PageNumber, result, debug);
+                }
 
                 // Prefer spatial parsing whenever PdfPig supplied word coordinates.
                 // This prevents one manhole from absorbing pipe labels belonging to
@@ -146,6 +173,46 @@ namespace SewerScan.Infrastructure.Parsers
                     "\n[ParserDebug Page " + page.PageNumber + "]\n" +
                     debug;
             }
+
+            if (string.Equals(result.DrawingType, "PROFIL", StringComparison.OrdinalIgnoreCase) &&
+                pages.Any(p => (p.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase)))
+            {
+                var ocrPageNumbers = pages
+                    .Where(p => (p.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase))
+                    .Select(p => p.PageNumber)
+                    .ToHashSet();
+                result.Pipes.RemoveAll(p =>
+                    ocrPageNumbers.Contains(p.Page) &&
+                    ShouldRemoveOcrProfilePipe(p, pages.First(page => page.PageNumber == p.Page)));
+            }
+
+            if (string.Equals(result.DrawingType, "PROFIL", StringComparison.OrdinalIgnoreCase))
+            {
+                foreach (var page in pages)
+                {
+                    var pageText = string.Join("\n", new[] { page.Text, page.RawText, page.OrderedText }
+                        .Where(text => !string.IsNullOrWhiteSpace(text)));
+                    var hasCoverClassD400 = Regex.IsMatch(pageText, @"\bklas[ay]\s+D\s*400\b", RegexOptions.IgnoreCase);
+                    var hasExplicitPipeD400 = Regex.IsMatch(
+                        pageText,
+                        @"\b(?:PVC-U|PVC|PE-HD|PEHD|HDPE|PP|PE)\b[^\r\n]{0,20}\b(?:DN|D|Ø|ø)\s*400\b",
+                        RegexOptions.IgnoreCase) ||
+                        result.Pipes.Any(pipe =>
+                            pipe.Page == page.PageNumber && pipe.DiameterMm == 400 &&
+                            string.Equals(pipe.Material, "BETON", StringComparison.OrdinalIgnoreCase));
+                    if (hasCoverClassD400 && !hasExplicitPipeD400)
+                        result.Pipes.RemoveAll(pipe => pipe.Page == page.PageNumber && pipe.DiameterMm == 400);
+                }
+
+                result.Pipes.RemoveAll(pipe =>
+                    !pipe.DiameterMm.HasValue &&
+                    !string.IsNullOrWhiteSpace(pipe.Material) &&
+                    result.Pipes.Any(other =>
+                        other.Page == pipe.Page &&
+                        other.DiameterMm.HasValue &&
+                        string.Equals(other.Material, pipe.Material, StringComparison.OrdinalIgnoreCase)));
+            }
+
             // OCR cleanup: normalize identifiers such as S08 -> S8 and remove very high,
             // unsupported labels that are typical OCR artefacts (e.g. S95).
             foreach (var mh in result.Manholes)
@@ -229,6 +296,81 @@ namespace SewerScan.Infrastructure.Parsers
             return Task.FromResult(result);
         }
 
+        private static bool IsStandardOcrProfilePipeDiameter(int diameter) => diameter is
+            50 or 63 or 75 or 90 or 100 or 110 or 125 or 150 or 160 or 200 or 225 or 250 or
+            300 or 315 or 400 or 450 or 500 or 600 or 630 or 800;
+
+        private static bool ShouldRemoveOcrProfilePipe(ParsedPipe pipe, PageText page)
+        {
+            if (string.IsNullOrWhiteSpace(pipe.Material) || !pipe.DiameterMm.HasValue)
+                return true;
+
+            var diameter = pipe.DiameterMm.Value;
+            if (IsStandardOcrProfilePipeDiameter(diameter))
+                return false;
+
+            // Preserve uncommon but valid material-backed pipe dimensions. Small values
+            // outside the known set are typical truncated OCR numbers (29, 54, 107, 128).
+            if (diameter >= 150 && diameter < 800)
+                return false;
+
+            // Large pipes are valid in pressure/gravity networks. Reject one only when
+            // repeated coordinate tokens form one row and that row is spatially tied to
+            // a recovered profile node—not merely because the number occurs twice.
+            if (diameter >= 800)
+                return IsRepeatedManholeDiameterRow(page, diameter);
+
+            return true;
+        }
+
+        private static bool IsRepeatedManholeDiameterRow(PageText page, int diameter)
+        {
+            var diameterItems = page.Items
+                .Where(item => IsOcrRenderingOfDiameter(item.Text, diameter))
+                .ToList();
+            if (diameterItems.Count < 2)
+                return false;
+
+            var anchors = FindSpatialManholeAnchors(page.Items, "PROFIL", isOcrPage: true);
+            if (anchors.Count == 0)
+                return false;
+
+            foreach (var seed in diameterItems)
+            {
+                var seedCenterY = seed.Y - seed.Height / 2.0;
+                var row = diameterItems
+                    .Where(item => Math.Abs((item.Y - item.Height / 2.0) - seedCenterY) <= Math.Max(8, seed.Height))
+                    .ToList();
+                var distinctPositions = row
+                    .Select(item => Math.Round(item.X / 20.0))
+                    .Distinct()
+                    .Count();
+                if (distinctPositions < 2)
+                    continue;
+
+                if (row.Any(item =>
+                    anchors.Any(anchor => Math.Abs((item.X + item.Width / 2.0) - anchor.X) <= 75)))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsOcrRenderingOfDiameter(string? text, int expectedDiameter)
+        {
+            var token = NormalizeExtractedText(text ?? string.Empty).Replace(" ", string.Empty).ToUpperInvariant();
+            var match = Regex.Match(token, @"^(?:DN|D|Ø)(?<value>[0-9OIL|]{2,4})$");
+            if (!match.Success)
+                return false;
+
+            var digits = match.Groups["value"].Value
+                .Replace('O', '0')
+                .Replace('I', '1')
+                .Replace('L', '1')
+                .Replace('|', '1');
+            return int.TryParse(digits, out var parsed) && parsed == expectedDiameter;
+        }
+
         private sealed class SpatialManholeAnchor
         {
             public string Identifier { get; init; } = string.Empty;
@@ -271,7 +413,7 @@ namespace SewerScan.Infrastructure.Parsers
         }
 
         private static readonly Regex ExactSpatialManholeRegex = new(
-            @"^(?:(?<token>KD|KS)(?<number>\d+(?:[./-]\d+)*)|(?<token>D|S)(?<number>\d{1,3}(?:[./-]\d+)*)|(?<special>SO))$",
+            @"^(?:(?<token>KD|KS)(?<number>\d+(?:[./-]\d+)*)|(?<token>D|S|K)(?<number>\d{1,3}(?:[./-]\d+)*)|(?<special>KDist|SO))$",
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex ExactSpatialInletRegex = new(
@@ -347,7 +489,8 @@ namespace SewerScan.Infrastructure.Parsers
                 return false;
             }
 
-            var anchors = FindSpatialManholeAnchors(usable, result.DrawingType);
+            var preliminaryIsOcr = (page.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase);
+            var anchors = FindSpatialManholeAnchors(usable, result.DrawingType, preliminaryIsOcr);
 
             if (string.Equals(result.DrawingType, "PROFIL", StringComparison.OrdinalIgnoreCase))
             {
@@ -362,7 +505,6 @@ namespace SewerScan.Infrastructure.Parsers
                         .First())
                     .ToList();
 
-            var preliminaryIsOcr = (page.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase);
             if (preliminaryIsOcr && string.Equals(result.DrawingType, "PZT", StringComparison.OrdinalIgnoreCase))
             {
                 var before = anchors.Count;
@@ -484,23 +626,54 @@ namespace SewerScan.Infrastructure.Parsers
             StringBuilder debug)
         {
             var output = existing.ToList();
-            var prefix = Regex.IsMatch(pageText ?? string.Empty, @"KANALIZACJI\s+DESZCZ|DESZCZOW", RegexOptions.IgnoreCase)
+            bool FamilyIsConfirmedByNumericRow(string family) => output.Any(a =>
+            {
+                var match = Regex.Match(a.Identifier, "^" + family + @"(?<n>\d+)$", RegexOptions.IgnoreCase);
+                if (!match.Success)
+                    return false;
+
+                var number = match.Groups["n"].Value;
+                return items.Any(i =>
+                {
+                    var rawToken = (i.Text ?? string.Empty).Trim();
+                    if (!Regex.IsMatch(rawToken, @"^\d{1,2}$"))
+                        return false;
+                    var token = rawToken;
+                    var cx = i.X + i.Width / 2.0;
+                    var cy = i.Y - i.Height / 2.0;
+                    return token == number && Math.Abs(cx - a.X) <= 75 && Math.Abs(cy - a.Y) <= 32;
+                });
+            });
+
+            var observedKd = FamilyIsConfirmedByNumericRow("KD");
+            var observedKs = FamilyIsConfirmedByNumericRow("KS");
+            var isStorm = Regex.IsMatch(pageText ?? string.Empty, @"KANALIZACJI\s+DESZCZ|DESZCZOW", RegexOptions.IgnoreCase);
+            var isSanitary = Regex.IsMatch(pageText ?? string.Empty, @"KANALIZACJI\s+SANITAR|SANITARN", RegexOptions.IgnoreCase);
+            var prefix = observedKd && observedKs
+                ? isSanitary && !isStorm ? "KS" : isStorm && !isSanitary ? "KD" : string.Empty
+                : observedKd
+                ? "KD"
+                : observedKs
+                    ? "KS"
+                    : isStorm
                 ? "D"
-                : Regex.IsMatch(pageText ?? string.Empty, @"KANALIZACJI\s+SANITAR|SANITARN", RegexOptions.IgnoreCase)
+                : isSanitary
                     ? "S"
                     : string.Empty;
 
             if (string.IsNullOrWhiteSpace(prefix))
                 return output;
 
+            if (observedKd && observedKs && (prefix == "KD" || prefix == "KS"))
+            {
+                var conflictingFamily = prefix == "KD" ? "KS" : "KD";
+                output.RemoveAll(a => Regex.IsMatch(a.Identifier, "^" + conflictingFamily + @"\d+$", RegexOptions.IgnoreCase));
+            }
+
             // Do not invent a second identity row when OCR already recovered a usable family row.
             var familyAnchors = output.Count(a => Regex.IsMatch(a.Identifier, "^" + prefix + @"\d", RegexOptions.IgnoreCase));
             if (familyAnchors >= 3)
                 return output;
-
-            var heights = items.Where(i => i.Height > 0).Select(i => i.Height).OrderBy(h => h).ToList();
-            var typicalHeight = heights.Count > 0 ? heights[heights.Count / 2] : 10.0;
-            var yTolerance = Math.Max(9.0, Math.Min(32.0, typicalHeight * 2.2));
 
             var bare = items
                 .Select((item, index) => new
@@ -528,6 +701,14 @@ namespace SewerScan.Infrastructure.Parsers
 
             if (bare.Count < 3)
                 return output;
+
+            // OCR often places unrelated quantities 15-30 px above the actual node-number
+            // baseline. A page-wide median text height made those rows collapse together on
+            // large-format drawings. Derive a deliberately tight tolerance from the numeric
+            // glyphs themselves so a clean 1..N row remains separate from dimensions/slopes.
+            var bareHeights = bare.Select(x => (double)x.Item.Height).Where(h => h > 0).OrderBy(h => h).ToList();
+            var typicalBareHeight = bareHeights.Count > 0 ? bareHeights[bareHeights.Count / 2] : 10.0;
+            var yTolerance = Math.Max(3.0, Math.Min(8.0, typicalBareHeight * 0.65));
 
             var bands = new List<List<dynamic>>();
             foreach (var n in bare.OrderBy(x => x.Y))
@@ -570,7 +751,8 @@ namespace SewerScan.Infrastructure.Parsers
                     }) >= 2);
 
                     var score = distinct * 5.0 + sequentialLinks * 24.0 + engineeringColumns * 20.0 + Math.Min(20.0, span / 80.0);
-                    return new { Row = row, Distinct = distinct, Span = span, SequentialLinks = sequentialLinks, EngineeringColumns = engineeringColumns, Score = score };
+                    var requiredSequentialLinks = Math.Max(2, distinct / 2);
+                    return new { Row = row, Distinct = distinct, Span = span, SequentialLinks = sequentialLinks, RequiredSequentialLinks = requiredSequentialLinks, EngineeringColumns = engineeringColumns, Score = score };
                 })
                 // 4.2.6: Batorego's storm profile loses the D prefixes and also has too
                 // little clean elevation OCR to satisfy the 4.2.5 engineering-column gate.
@@ -578,7 +760,7 @@ namespace SewerScan.Infrastructure.Parsers
                 // itself strong table-structure evidence. Keep the old engineering-supported
                 // path, but additionally accept >=5 IDs with >=4 consecutive links.
                 .Where(x => x.Span >= 120 && (
-                    (x.Distinct >= 3 && x.SequentialLinks >= 2 && x.EngineeringColumns >= 2) ||
+                    (x.Distinct >= 3 && x.SequentialLinks >= x.RequiredSequentialLinks && x.EngineeringColumns >= 2) ||
                     (x.Distinct >= 5 && x.SequentialLinks >= 4)))
                 .OrderByDescending(x => x.Score)
                 .FirstOrDefault();
@@ -602,8 +784,10 @@ namespace SewerScan.Infrastructure.Parsers
             foreach (var n in scored.Row)
             {
                 var identifier = prefix + ((int)n.Number).ToString(System.Globalization.CultureInfo.InvariantCulture);
-                if (output.Any(a => string.Equals(a.Identifier, identifier, StringComparison.OrdinalIgnoreCase)))
-                    continue;
+                // A prefixed token elsewhere on the drawing may be an OCR hallucination of
+                // the same identifier. The coherent numeric table row is stronger evidence,
+                // so replace an off-row anchor instead of allowing it to suppress recovery.
+                output.RemoveAll(a => string.Equals(a.Identifier, identifier, StringComparison.OrdinalIgnoreCase));
 
                 output.Add(new SpatialManholeAnchor
                 {
@@ -632,7 +816,9 @@ namespace SewerScan.Infrastructure.Parsers
             // densest identifier Y-band as the primary set of table columns.
             var heights = items.Where(i => i.Height > 0).Select(i => i.Height).OrderBy(h => h).ToList();
             var typicalHeight = heights.Count > 0 ? heights[heights.Count / 2] : 10.0;
-            var yTolerance = Math.Max(12.0, Math.Min(55.0, typicalHeight * 3.5));
+            // Keep adjacent OCR table rows distinct. Large-format scans frequently have a
+            // quantity row only ~15-30 px from the node identifiers.
+            var yTolerance = Math.Max(6.0, Math.Min(12.0, typicalHeight * 0.8));
 
             var bands = new List<List<SpatialManholeAnchor>>();
             foreach (var anchor in candidates.OrderBy(a => a.Y))
@@ -662,6 +848,15 @@ namespace SewerScan.Infrastructure.Parsers
                     var engineeringColumns = 0;
                     var dnColumns = 0;
                     var syntaxPenalty = 0;
+                    var rowMarkerBonus = b.Any(a => string.Equals(a.Identifier, "KDIST", StringComparison.OrdinalIgnoreCase))
+                        ? 240.0
+                        : 0.0;
+                    var cohesiveNetworkFamilyBonus = b
+                        .Select(a => a.Identifier)
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .Count(id => Regex.IsMatch(id, @"^(?:KD|KS)\d", RegexOptions.IgnoreCase)) >= 3
+                        ? 120.0
+                        : 0.0;
 
                     foreach (var a in b.GroupBy(x => x.Identifier, StringComparer.OrdinalIgnoreCase).Select(g => g.First()))
                     {
@@ -689,7 +884,10 @@ namespace SewerScan.Infrastructure.Parsers
                         if (n.Success && int.TryParse(n.Groups["n"].Value, out var number) && number >= 30) syntaxPenalty += 5;
                     }
 
-                    var score = engineeringColumns * 24.0 + dnColumns * 14.0 + distinct * 2.0 - syntaxPenalty;
+                    // KDist is the explicit "existing storm sewer" node printed in the same
+                    // structure row as KD1...KDn. It is substantially stronger evidence than
+                    // a denser OCR band made from fragments of elevations and descriptions.
+                    var score = rowMarkerBonus + cohesiveNetworkFamilyBonus + engineeringColumns * 24.0 + dnColumns * 14.0 + distinct * 2.0 - syntaxPenalty;
                     return new { Band = b, Distinct = distinct, Width = width, EngineeringColumns = engineeringColumns, DnColumns = dnColumns, Score = score };
                 })
                 .OrderByDescending(x => x.Score)
@@ -706,6 +904,38 @@ namespace SewerScan.Infrastructure.Parsers
                 .Select(g => g.OrderBy(a => Math.Abs(a.Y - best.Band.Average(x => x.Y))).First())
                 .OrderBy(a => a.X)
                 .ToList();
+
+            if (selected.Any(a => string.Equals(a.Identifier, "KDIST", StringComparison.OrdinalIgnoreCase)))
+            {
+                selected = selected
+                    .Where(a => string.Equals(a.Identifier, "KDIST", StringComparison.OrdinalIgnoreCase) ||
+                                Regex.IsMatch(a.Identifier, @"^KD\d", RegexOptions.IgnoreCase))
+                    .ToList();
+            }
+            else
+            {
+                // A profile table may overlap the title block in OCR coordinates. When a
+                // clear KD/KS sequence exists, retain another identifier type only if it is
+                // spatially part of that sequence rather than far away in the title block.
+                var dominantFamily = new[] { "KD", "KS", "K" }
+                    .Select(prefix => new
+                    {
+                        Prefix = prefix,
+                        Anchors = selected
+                            .Where(a => Regex.IsMatch(a.Identifier, $@"^{prefix}\d", RegexOptions.IgnoreCase))
+                            .OrderBy(a => a.X)
+                            .ToList()
+                    })
+                    .OrderByDescending(x => x.Anchors.Count)
+                    .First();
+
+                if (dominantFamily.Anchors.Count >= 3)
+                {
+                    selected = selected
+                        .Where(a => Regex.IsMatch(a.Identifier, $@"^{dominantFamily.Prefix}\d", RegexOptions.IgnoreCase))
+                        .ToList();
+                }
+            }
 
             // If the densest band is too small, fall back to the previous evidence-based strategy.
             if (selected.Count < 3)
@@ -724,7 +954,10 @@ namespace SewerScan.Infrastructure.Parsers
             return selected;
         }
 
-        private static List<SpatialManholeAnchor> FindSpatialManholeAnchors(IReadOnlyList<TextItem> usable, string drawingType)
+        private static List<SpatialManholeAnchor> FindSpatialManholeAnchors(
+            IReadOnlyList<TextItem> usable,
+            string drawingType,
+            bool isOcrPage)
         {
             var anchors = new List<SpatialManholeAnchor>();
 
@@ -733,11 +966,16 @@ namespace SewerScan.Infrastructure.Parsers
             {
                 var item = usable[itemIndex];
                 var token = CleanSpatialToken(item.Text);
+                if (isOcrPage && string.Equals(drawingType, "PROFIL", StringComparison.OrdinalIgnoreCase))
+                    token = NormalizeOcrProfileIdentifierToken(token, item, usable);
                 var match = ExactSpatialManholeRegex.Match(token);
                 if (!match.Success)
                     continue;
 
                 var identifier = BuildSpatialIdentifier(match);
+                if (Regex.IsMatch(identifier, @"^K\d", RegexOptions.IgnoreCase) &&
+                    !string.Equals(drawingType, "PROFIL", StringComparison.OrdinalIgnoreCase))
+                    continue;
                 if (!IsLikelySpatialManholeIdentifier(identifier))
                     continue;
 
@@ -754,7 +992,9 @@ namespace SewerScan.Infrastructure.Parsers
             // Reconstruct only very close, same-line pairs so ordinary drawing text is not promoted to a manhole.
             var prefixes = usable
                 .Select((item, index) => new { Item = item, Index = index })
-                .Where(x => Regex.IsMatch(CleanSpatialToken(x.Item.Text), @"^(?:D|S|KD|KS)$", RegexOptions.IgnoreCase))
+                .Where(x => Regex.IsMatch(CleanSpatialToken(x.Item.Text),
+                    string.Equals(drawingType, "PROFIL", StringComparison.OrdinalIgnoreCase) ? @"^(?:D|S|K|KD|KS)$" : @"^(?:D|S|KD|KS)$",
+                    RegexOptions.IgnoreCase))
                 .ToList();
 
             foreach (var prefixEntry in prefixes)
@@ -1117,11 +1357,34 @@ namespace SewerScan.Infrastructure.Parsers
                         identifiers.Add(id);
                 }
 
-                foreach (var a in FindSpatialManholeAnchors(page.Items, result.DrawingType))
+                foreach (var a in FindSpatialManholeAnchors(
+                             page.Items,
+                             result.DrawingType,
+                             (page.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase)))
                     identifiers.Add(a.Identifier);
             }
 
             var isOcr = (page.ExtractionEngine ?? string.Empty).StartsWith("OCR/", StringComparison.OrdinalIgnoreCase);
+            string? credibleOcrProfileFamily = null;
+            if (string.Equals(result.DrawingType, "PROFIL", StringComparison.OrdinalIgnoreCase))
+            {
+                if (spatialAnchors.Any(a => string.Equals(a.Identifier, "KDIST", StringComparison.OrdinalIgnoreCase)) &&
+                    spatialAnchors.Count(a => Regex.IsMatch(a.Identifier, @"^KD\d+$", RegexOptions.IgnoreCase)) >= 2)
+                    credibleOcrProfileFamily = "KD";
+                else
+                    credibleOcrProfileFamily = new[] { "KD", "KS", "K" }
+                        .FirstOrDefault(prefix => spatialAnchors.Count(a =>
+                            Regex.IsMatch(a.Identifier, $@"^{prefix}\d+(?:[./-]\d+)*$", RegexOptions.IgnoreCase)) >= 3);
+
+                if (credibleOcrProfileFamily != null)
+                {
+                    identifiers.RemoveWhere(id =>
+                        !Regex.IsMatch(id, $@"^{credibleOcrProfileFamily}\d+(?:[./-]\d+)*$", RegexOptions.IgnoreCase) &&
+                        !(credibleOcrProfileFamily == "KD" && string.Equals(id, "KDIST", StringComparison.OrdinalIgnoreCase)));
+                    debug.AppendLine($"Text fallback restricted to the credible {credibleOcrProfileFamily} profile family.");
+                }
+            }
+
             foreach (var id in identifiers)
             {
                 if (result.Manholes.Any(m => m.Page == page.PageNumber && string.Equals(m.Identifier, id, StringComparison.OrdinalIgnoreCase)))
@@ -1284,19 +1547,22 @@ namespace SewerScan.Infrastructure.Parsers
 
         private static bool IsLikelySpatialManholeIdentifier(string identifier)
         {
+            if (string.Equals(identifier, "KDIST", StringComparison.OrdinalIgnoreCase))
+                return true;
+
             if (string.Equals(identifier, "SO", StringComparison.OrdinalIgnoreCase))
                 return true;
 
             // Existing pipes such as "ist. ks200" and "ist. ks160" are common on drawings.
             // KS/KD manhole numbering is normally a short index, not a pipe diameter.
-            var match = Regex.Match(identifier, @"^(?<token>KD|KS|D|S)(?<n>\d+)", RegexOptions.IgnoreCase);
+            var match = Regex.Match(identifier, @"^(?<token>KD|KS|D|S|K)(?<n>\d+)", RegexOptions.IgnoreCase);
             if (!match.Success || !int.TryParse(match.Groups["n"].Value, out var n))
                 return false;
 
             var token = match.Groups["token"].Value.ToUpperInvariant();
             if ((token == "KS" || token == "KD") && n >= 100)
                 return false;
-            if ((token == "D" || token == "S") && n >= 100)
+            if ((token == "D" || token == "S" || token == "K") && n >= 100)
                 return false;
 
             // Vision 3.1: reject classic OCR contamination such as S3/2025.
@@ -1416,6 +1682,51 @@ namespace SewerScan.Infrastructure.Parsers
                 .Replace(" ", string.Empty);
 
             return NormalizeCadDuplicatedGlyphs(value);
+        }
+
+        private static string NormalizeOcrProfileIdentifierToken(
+            string token,
+            TextItem item,
+            IReadOnlyList<TextItem> usable)
+        {
+            // On the Dywity OCR profile the narrow final digit is repeatedly read as a
+            // letter. These corrections are unsafe for ordinary CAD/PZT tokens, so the
+            // caller enables them only for OCR pages classified as longitudinal profiles.
+            if (Regex.IsMatch(token, @"^KD(?:I|L|\|)$", RegexOptions.IgnoreCase))
+                return "KD1";
+            if (Regex.IsMatch(token, @"^KDS$", RegexOptions.IgnoreCase))
+                return "KD5";
+
+            // The sanitary profile exposes several OCR alternatives at the same drawing
+            // position. Use the alternative spelling to restore the decimal separator;
+            // never reinterpret a standalone, potentially legitimate KS21 label.
+            if (Regex.IsMatch(token, @"^KS21$", RegexOptions.IgnoreCase) &&
+                HasNearbyOcrAlternative(item, usable, @"^KSE(?:\.1|I)$"))
+                return "KS2.1";
+            if (Regex.IsMatch(token, @"^KSE(?:\.1|I)$", RegexOptions.IgnoreCase))
+                return "KS2.1";
+
+            // Likewise OCR reads the compact branch label KS3.1 as s31. Require the
+            // neighbouring parent KS3 label from the same node row before correcting it.
+            if (Regex.IsMatch(token, @"^S31$", RegexOptions.IgnoreCase) &&
+                HasNearbyOcrAlternative(item, usable, @"^KS3$", 45))
+                return "KS3.1";
+
+            return token;
+        }
+
+        private static bool HasNearbyOcrAlternative(
+            TextItem source,
+            IReadOnlyList<TextItem> items,
+            string pattern,
+            double maxHorizontalDistance = 24)
+        {
+            var sourceCenterY = source.Y - source.Height / 2.0;
+            return items.Any(candidate =>
+                !ReferenceEquals(candidate, source) &&
+                Regex.IsMatch(CleanSpatialToken(candidate.Text), pattern, RegexOptions.IgnoreCase) &&
+                Math.Abs((candidate.Y - candidate.Height / 2.0) - sourceCenterY) <= Math.Max(4, source.Height) &&
+                Math.Abs(candidate.X - source.X) <= maxHorizontalDistance);
         }
 
         private static int SpatialNeighborhoodScore(SpatialManholeAnchor anchor, IReadOnlyList<TextItem> items)
@@ -2438,7 +2749,7 @@ namespace SewerScan.Infrastructure.Parsers
         {
             if (string.IsNullOrWhiteSpace(identifier)) return identifier;
             if (string.Equals(identifier, "SO", StringComparison.OrdinalIgnoreCase)) return "SO";
-            var m = Regex.Match(identifier.Trim(), @"^(?<p>KD|KS|D|S)(?<n>\d{1,3}(?:[./-]\d+)*)$", RegexOptions.IgnoreCase);
+            var m = Regex.Match(identifier.Trim(), @"^(?<p>KD|KS|D|S|K)(?<n>\d{1,3}(?:[./-]\d+)*)$", RegexOptions.IgnoreCase);
             if (!m.Success) return identifier.Trim().ToUpperInvariant();
             return m.Groups["p"].Value.ToUpperInvariant() + NormalizeIdentifierNumber(m.Groups["n"].Value);
         }
@@ -2711,6 +3022,121 @@ namespace SewerScan.Infrastructure.Parsers
                     debug.AppendLine(
                         $"DN pipe matched: {dn.Value} mat={parsed.Material}");
                 }
+            }
+        }
+
+        private static void ParseProfilePvcUSchedules(
+            string text,
+            int pageNumber,
+            ParsedProject result,
+            StringBuilder debug)
+        {
+            foreach (Match match in ProfilePvcUScheduleRegex.Matches(text ?? string.Empty))
+            {
+                if (!int.TryParse(match.Groups["diam"].Value, out var diameter) || diameter < 50 || diameter > 2000)
+                    continue;
+
+                if (result.Pipes.Any(pipe =>
+                    pipe.Page == pageNumber &&
+                    pipe.DiameterMm == diameter &&
+                    string.Equals(pipe.Material, "PVC", StringComparison.OrdinalIgnoreCase)))
+                    continue;
+
+                result.Pipes.Add(new ParsedPipe
+                {
+                    Page = pageNumber,
+                    Material = "PVC",
+                    DiameterMm = diameter,
+                    RawText = match.Value
+                });
+                debug.AppendLine($"Profile PVC-U schedule matched: DN {diameter}.");
+            }
+
+            if (!Regex.IsMatch(text ?? string.Empty, @"\bPVC-U(?=\b|_)", RegexOptions.IgnoreCase))
+                return;
+
+            foreach (Match match in ProfileBareDiameterBeforeSlopeRegex.Matches(text ?? string.Empty))
+            {
+                if (!int.TryParse(match.Groups["diam"].Value, out var diameter))
+                    continue;
+                var source = text ?? string.Empty;
+                var contextStart = Math.Max(0, match.Index - 240);
+                var precedingContext = source.Substring(contextStart, match.Index - contextStart);
+                var pvcIndex = precedingContext.LastIndexOf("PVC-U", StringComparison.OrdinalIgnoreCase);
+                if (pvcIndex < 0)
+                    continue;
+                var sincePvcHeader = precedingContext.Substring(pvcIndex);
+                if (Regex.IsMatch(sincePvcHeader, @"\b(?:beton|żelbet|PE-HD|PEHD|HDPE|PP|PE)\w*\b", RegexOptions.IgnoreCase))
+                    continue;
+                if (result.Pipes.Any(pipe =>
+                    pipe.Page == pageNumber && pipe.DiameterMm == diameter &&
+                    string.Equals(pipe.Material, "PVC", StringComparison.OrdinalIgnoreCase)))
+                    continue;
+
+                result.Pipes.Add(new ParsedPipe
+                {
+                    Page = pageNumber,
+                    Material = "PVC",
+                    DiameterMm = diameter,
+                    RawText = match.Value.Trim()
+                });
+                debug.AppendLine($"Profile PVC-U bare schedule diameter matched: DN {diameter}.");
+            }
+        }
+
+        private static void ParseProfileConcreteSchedules(
+            string text,
+            int pageNumber,
+            ParsedProject result,
+            StringBuilder debug)
+        {
+            var source = text ?? string.Empty;
+            foreach (var match in ProfileConcreteScheduleRegex.Matches(source).Cast<Match>()
+                         .Concat(ProfileConcreteLegendRegex.Matches(source).Cast<Match>()))
+            {
+                if (!int.TryParse(match.Groups["diam"].Value, out var diameter) || diameter < 100 || diameter > 2000)
+                    continue;
+                if (result.Pipes.Any(pipe =>
+                    pipe.Page == pageNumber && pipe.DiameterMm == diameter &&
+                    string.Equals(pipe.Material, "BETON", StringComparison.OrdinalIgnoreCase)))
+                    continue;
+
+                result.Pipes.Add(new ParsedPipe
+                {
+                    Page = pageNumber,
+                    Material = "BETON",
+                    DiameterMm = diameter,
+                    RawText = NormalizeExtractedText(match.Value)
+                });
+                debug.AppendLine($"Profile concrete schedule matched: DN {diameter}.");
+            }
+        }
+
+        private static void ParseProfileDiameterBeforeMaterial(
+            string text,
+            int pageNumber,
+            ParsedProject result,
+            StringBuilder debug)
+        {
+            foreach (Match match in ProfileDiameterBeforeMaterialRegex.Matches(text ?? string.Empty))
+            {
+                if (!int.TryParse(match.Groups["diam"].Value, out var diameter) || diameter < 50 || diameter > 2000)
+                    continue;
+                var rawMaterial = match.Groups["mat"].Value.ToUpperInvariant();
+                var material = rawMaterial is "PEHD" or "HDPE" or "PE-HD" ? "PE-HD" : rawMaterial;
+                if (result.Pipes.Any(pipe =>
+                    pipe.Page == pageNumber && pipe.DiameterMm == diameter &&
+                    string.Equals(pipe.Material, material, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+
+                result.Pipes.Add(new ParsedPipe
+                {
+                    Page = pageNumber,
+                    Material = material,
+                    DiameterMm = diameter,
+                    RawText = match.Value
+                });
+                debug.AppendLine($"Profile diameter-before-material schedule matched: {material} DN {diameter}.");
             }
         }
 
