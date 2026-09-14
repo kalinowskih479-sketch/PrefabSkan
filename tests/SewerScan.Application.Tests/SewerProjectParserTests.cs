@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
+using SewerScan.Application.DTO;
 using SewerScan.Application.Models;
+using SewerScan.Application.Services;
 using SewerScan.Infrastructure.Parsers;
 using Xunit;
 
@@ -850,5 +852,61 @@ public class InletScheduleRegressionTests
         var result = await parser.ParseAsync(new[] { page });
 
         Assert.Equal("TABELA WPUSTÓW", result.DrawingType);
+    }
+}
+
+public class ZawadyProfileRegressionTests
+{
+    [Fact]
+    public void Standard_Analysis_Summary_Is_Generic_Not_Batorego_Specific()
+    {
+        var project = new ParsedProject { DrawingType = "PROFIL" };
+        project.SourceDocuments.Add("Zawady-ETAP 5_profile.pdf");
+        project.Manholes.Add(new ParsedManhole { Identifier = "S1", CompletenessPercent = 75 });
+
+        var summary = AnalysisResultSummary.BuildCompact(project);
+
+        Assert.Contains("PROFIL", summary);
+        Assert.Contains("studnie 1", summary);
+        Assert.DoesNotContain("BATOREGO", summary, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task Ocr_Profile_Uses_Staggered_Node_Columns_And_Rejects_Sheet_Title_Identifier()
+    {
+        var parser = new SewerProjectParser();
+        var page = new PageText
+        {
+            PageNumber = 1,
+            ExtractionEngine = "OCR/Tesseract",
+            Text = "[[PREFABSCAN_DRAWING:PROFIL]] PROFIL KANALIZACJI SANITARNEJ RZĘDNE DNA PRZEWODU"
+        };
+
+        page.Items.AddRange(new[]
+        {
+            // OCR z obróconego arkusza umieszcza podpisy węzłów na lekko różnych Y.
+            new TextItem { Text = "S1", X = 100, Y = 710, Width = 18, Height = 10 },
+            new TextItem { Text = "S2", X = 250, Y = 728, Width = 18, Height = 10 },
+            new TextItem { Text = "S3", X = 400, Y = 746, Width = 18, Height = 10 },
+
+            new TextItem { Text = "135,40", X = 92,  Y = 420, Width = 42, Height = 10 },
+            new TextItem { Text = "134,20", X = 92,  Y = 370, Width = 42, Height = 10 },
+            new TextItem { Text = "135,25", X = 242, Y = 420, Width = 42, Height = 10 },
+            new TextItem { Text = "133,95", X = 242, Y = 370, Width = 42, Height = 10 },
+            new TextItem { Text = "135,10", X = 392, Y = 420, Width = 42, Height = 10 },
+            new TextItem { Text = "133,70", X = 392, Y = 370, Width = 42, Height = 10 },
+
+            // Numer arkusza w tabliczce rysunkowej, bez danych inżynierskich w swojej kolumnie.
+            new TextItem { Text = "S20", X = 900, Y = 90, Width = 24, Height = 12 },
+            new TextItem { Text = "NR RYS.", X = 850, Y = 90, Width = 45, Height = 12 }
+        });
+
+        var result = await parser.ParseAsync(new[] { page });
+
+        Assert.Equal(new[] { "S1", "S2", "S3" },
+            result.Manholes.Select(m => m.Identifier).OrderBy(id => id));
+        Assert.Equal(1.20, result.Manholes.Single(m => m.Identifier == "S1").HeightM);
+        Assert.Equal(1.30, result.Manholes.Single(m => m.Identifier == "S2").HeightM);
+        Assert.Equal(1.40, result.Manholes.Single(m => m.Identifier == "S3").HeightM);
     }
 }

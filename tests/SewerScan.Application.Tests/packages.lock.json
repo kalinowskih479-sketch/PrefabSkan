@@ -272,7 +272,7 @@
       "sewerscan.application": {
         "type": "Project",
         "dependencies": {
-          "SewerScan.Domain": "[4.2.7, )"
+          "SewerScan.Domain": "[4.2.8, )"
         }
       },
       "sewerscan.domain": {
@@ -285,8 +285,8 @@
           "Magick.NET-Q8-AnyCPU": "[13.3.0, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[8.0.30, )",
           "PdfPig": "[0.1.15, )",
-          "SewerScan.Application": "[4.2.7, )",
-          "SewerScan.Domain": "[4.2.7, )",
+          "SewerScan.Application": "[4.2.8, )",
+          "SewerScan.Domain": "[4.2.8, )",
           "Tesseract": "[5.2.0, )"
         }
       },

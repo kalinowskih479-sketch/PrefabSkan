@@ -7,8 +7,8 @@ Pakiet musi zawierać aplikację oraz dwa modele w `tessdata`. Nie może zawiera
 ## Weryfikacja pobranego artefaktu
 
 ```powershell
-$expected = (Get-Content PrefabScan_4.2.7_Windows_x64.zip.sha256).Split()[0]
-$actual = (Get-FileHash -Algorithm SHA256 PrefabScan_4.2.7_Windows_x64.zip).Hash
+$expected = (Get-Content PrefabScan_4.2.8_Windows_x64.zip.sha256).Split()[0]
+$actual = (Get-FileHash -Algorithm SHA256 PrefabScan_4.2.8_Windows_x64.zip).Hash
 if ($actual -ne $expected) { throw 'Suma SHA-256 jest nieprawidłowa.' }
 ```
 
