@@ -72,13 +72,14 @@ namespace SewerScan.Infrastructure.Pdf
         private static bool IsPageUseful(PageText page) =>
             IsUseful(page) && !NeedsProfileOcrFallback(new[] { page });
 
-        private static bool AllPagesUseful(IReadOnlyList<PageText> pages) =>
+        internal static bool AllPagesUseful(IReadOnlyList<PageText> pages) =>
             pages.Count > 0 && pages.All(IsPageUseful);
 
-        private static List<PageText> MergePreferredPages(
+        internal static List<PageText> MergePreferredPages(
             IReadOnlyList<PageText> preferred, IReadOnlyList<PageText> fallback)
         {
-            var merged = preferred.ToDictionary(page => page.PageNumber);
+            var merged = preferred.GroupBy(page => page.PageNumber)
+                .ToDictionary(group => group.Key, group => group.First());
             foreach (var candidate in fallback)
             {
                 if (!merged.TryGetValue(candidate.PageNumber, out var existing) ||
