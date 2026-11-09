@@ -126,4 +126,19 @@ public class PdfTextExtractorFallbackTests
         Assert.Equal(2, result.Count);
         Assert.False(PdfTextExtractor.AllPagesUseful(result));
     }
+
+    [Fact]
+    public void Merge_Tolerates_Duplicate_Page_Numbers_In_Extractor_Output()
+    {
+        var pages = new[]
+        {
+            new PageText { PageNumber = 1, Text = "KD1 DN1000" },
+            new PageText { PageNumber = 1, Text = "KD1 DN1000" }
+        };
+
+        var result = PdfTextExtractor.MergePreferredPages(pages, Array.Empty<PageText>());
+
+        Assert.Single(result);
+        Assert.Equal(1, result[0].PageNumber);
+    }
 }
