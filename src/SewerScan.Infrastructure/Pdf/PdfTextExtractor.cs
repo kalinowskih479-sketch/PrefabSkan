@@ -55,10 +55,10 @@ namespace SewerScan.Infrastructure.Pdf
                 foreach (var page in merged.Where(page => !IsPageUseful(page)))
                 {
                     page.ExtractionDiagnostics =
-                        "OCR_FAILED: Brak użytecznych danych na tej stronie.\\r\\n" +
-                        (string.IsNullOrWhiteSpace(pigFailure) ? string.Empty : $"PdfPig: {pigFailure}\\r\\n") +
-                        (string.IsNullOrWhiteSpace(pdfiumFailure) ? string.Empty : $"PDFium: {pdfiumFailure}\\r\\n") +
-                        (string.IsNullOrWhiteSpace(ocrFailure) ? string.Empty : $"OCR: {ocrFailure}\\r\\n") +
+                        "OCR_FAILED: Brak użytecznych danych na tej stronie.\r\n" +
+                        (string.IsNullOrWhiteSpace(pigFailure) ? string.Empty : $"PdfPig: {pigFailure}\r\n") +
+                        (string.IsNullOrWhiteSpace(pdfiumFailure) ? string.Empty : $"PDFium: {pdfiumFailure}\r\n") +
+                        (string.IsNullOrWhiteSpace(ocrFailure) ? string.Empty : $"OCR: {ocrFailure}\r\n") +
                         page.ExtractionDiagnostics;
                 }
                 return Task.FromResult((IReadOnlyList<PageText>)merged);
