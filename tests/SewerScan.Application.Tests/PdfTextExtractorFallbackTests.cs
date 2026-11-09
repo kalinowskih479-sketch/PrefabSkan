@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using SewerScan.Application.Models;
 using SewerScan.Infrastructure.Pdf;
 using Xunit;
@@ -57,5 +59,71 @@ public class PdfTextExtractorFallbackTests
         };
 
         Assert.True(PdfTextExtractor.NeedsProfileOcrFallback(new[] { page }));
+    }
+
+    [Fact]
+    public void Mixed_Document_Requires_Fallback_When_One_Page_Is_Empty()
+    {
+        var pages = new[]
+        {
+            new PageText { PageNumber = 1, Text = "KD1 DN1000 PVC DN200" },
+            new PageText { PageNumber = 2, Text = "" }
+        };
+
+        Assert.False(PdfTextExtractor.AllPagesUseful(pages));
+    }
+
+    [Fact]
+    public void Merge_Replaces_Only_Missing_Scan_Page_And_Keeps_Page_Order()
+    {
+        var vector = new[]
+        {
+            new PageText { PageNumber = 1, Text = "KD1 DN1000" },
+            new PageText { PageNumber = 2, Text = "" }
+        };
+        var ocr = new[]
+        {
+            new PageText { PageNumber = 2, Text = "KS2 DN1200" },
+            new PageText { PageNumber = 1, Text = "OCR KD1 DN1000" }
+        };
+
+        var result = PdfTextExtractor.MergePreferredPages(vector, ocr);
+
+        Assert.Equal(new[] { 1, 2 }, result.Select(p => p.PageNumber));
+        Assert.Same(vector[0], result[0]);
+        Assert.Same(ocr[0], result[1]);
+        Assert.True(PdfTextExtractor.AllPagesUseful(result));
+    }
+
+    [Fact]
+    public void Merge_Replaces_Sparse_Profile_Title_With_Engineering_Ocr()
+    {
+        var vector = new[]
+        {
+            new PageText { PageNumber = 1, Text = "PROFILE KANALIZACJI DESZCZOWEJ" }
+        };
+        var ocr = new[]
+        {
+            new PageText { PageNumber = 1, Text = "PROFIL KANALIZACJI DESZCZOWEJ KD4 DN1000" }
+        };
+
+        var result = PdfTextExtractor.MergePreferredPages(vector, ocr);
+
+        Assert.Same(ocr[0], Assert.Single(result));
+    }
+
+    [Fact]
+    public void Merge_Keeps_Unresolved_Page_For_Diagnostics()
+    {
+        var vector = new[]
+        {
+            new PageText { PageNumber = 1, Text = "KD1 DN1000" },
+            new PageText { PageNumber = 2, Text = "" }
+        };
+
+        var result = PdfTextExtractor.MergePreferredPages(vector, Array.Empty<PageText>());
+
+        Assert.Equal(2, result.Count);
+        Assert.False(PdfTextExtractor.AllPagesUseful(result));
     }
 }
