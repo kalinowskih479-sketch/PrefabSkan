@@ -36,21 +36,27 @@ namespace SewerScan.Infrastructure.Pdf
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
             var pigPages = TryExtractWithPdfPig(filePath, out var pigFailure);
-            if (AllPagesUseful(pigPages))
+            // If PdfPig threw mid-document it may have returned only the first few
+            // pages. Do not treat that partial list as the whole PDF.
+            if (pigFailure == null && AllPagesUseful(pigPages))
                 return Task.FromResult((IReadOnlyList<PageText>)pigPages);
 
             // A mixed PDF can have selectable text on one page and a raster scan on another.
             // Evaluate each page independently; Any(IsUseful) would silently skip scans.
             var pdfiumPages = TryExtractWithPdfium(filePath, out var pdfiumFailure);
             var merged = MergePreferredPages(pigPages, pdfiumPages);
-            if (AllPagesUseful(merged))
+            if (pdfiumFailure == null && AllPagesUseful(merged))
                 return Task.FromResult((IReadOnlyList<PageText>)merged);
 
             // The OCR engine currently processes the complete PDF. Only use its output
             // for pages where both text engines failed or returned no engineering data.
             // Skip OCR for pages that have already yielded reliable text.
             // If both text engines failed completely, OCR the whole document.
-            var pagesForOcr = merged.Count == 0 ? null : GetPagesRequiringOcr(merged);
+            // When both text engines stopped with an error, their page inventory
+            // can be incomplete. Full OCR ensures no page is silently omitted.
+            var pagesForOcr = merged.Count == 0 || (pigFailure != null && pdfiumFailure != null)
+                ? null
+                : GetPagesRequiringOcr(merged);
             var ocrPages = OcrFallbackExtractor.Extract(filePath, out var ocrFailure, pagesForOcr);
             merged = MergePreferredPages(merged, ocrPages);
             if (merged.Count > 0)
