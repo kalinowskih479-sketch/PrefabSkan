@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using SewerScan.Application.Models;
 using SewerScan.Infrastructure.Pdf;
+using SewerScan.Infrastructure.Parsers;
 using Xunit;
 
 namespace SewerScan.Application.Tests;
@@ -167,5 +168,32 @@ public class PdfTextExtractorFallbackTests
         };
 
         Assert.Equal(new[] { 2 }, PdfTextExtractor.GetPagesRequiringOcr(pages));
+    }
+
+    [Fact]
+    public async System.Threading.Tasks.Task Ocr_Replacement_Preserves_Vector_Title_For_Drawing_Type_Detection()
+    {
+        var title = new PageText
+        {
+            PageNumber = 1,
+            Text = "PROFILE PODŁUŻNE SIECI KANALIZACJI DESZCZOWEJ"
+        };
+        var ocr = new PageText
+        {
+            PageNumber = 1,
+            Text = "KD4 DN1000",
+            RawText = "KD4 DN1000",
+            OrderedText = "KD4 DN1000",
+            ExtractionEngine = "OCR/Tesseract tiled"
+        };
+
+        var pages = PdfTextExtractor.MergePreferredPages(new[] { title }, new[] { ocr });
+        var merged = Assert.Single(pages);
+        Assert.Same(ocr, merged);
+        Assert.Contains(title.Text, merged.RawText);
+        Assert.Equal("KD4 DN1000", merged.Text);
+
+        var parsed = await new SewerProjectParser().ParseAsync(pages);
+        Assert.Equal("PROFIL", parsed.DrawingType);
     }
 }
