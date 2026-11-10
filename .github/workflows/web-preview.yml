@@ -1,0 +1,60 @@
+name: PrefabScan Web Preview
+
+on:
+  pull_request:
+    paths:
+      - 'src/SewerScan.Web/**'
+      - '.github/workflows/web-preview.yml'
+      - 'src/SewerScan.Application/**'
+      - 'src/SewerScan.Infrastructure/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      # Web is intentionally outside the locked desktop solution until its
+      # existing local counterpart can be reviewed and reconciled.
+      - name: Build Web Preview
+        run: dotnet build src/SewerScan.Web/SewerScan.Web.csproj -c Release -r win-x64
+      - name: Publish Web Preview
+        run: dotnet publish src/SewerScan.Web/SewerScan.Web.csproj -c Release -r win-x64 --self-contained true -o publish/web
+      - name: Copy validated offline OCR models
+        shell: pwsh
+        run: ./tools/Get-OcrModels.ps1 -Destination publish/web/tessdata
+      - name: Smoke-test localhost web server
+        shell: pwsh
+        run: |
+          $server = Start-Process -FilePath 'publish/web/SewerScan.Web.exe' -PassThru
+          try {
+            $ready = $false
+            for ($i = 0; $i -lt 30; $i++) {
+              try {
+                $status = Invoke-RestMethod -Uri 'http://127.0.0.1:5000/api/health' -TimeoutSec 2
+                if ($status.status -eq 'ok') { $ready = $true; break }
+              } catch {
+                Start-Sleep -Seconds 1
+              }
+            }
+            if (-not $ready) { throw 'Web server did not become ready.' }
+            $home = Invoke-WebRequest -Uri 'http://127.0.0.1:5000/' -TimeoutSec 10
+            if ($home.Content -notmatch 'PrefabScan') {
+              throw 'Web homepage did not render expected marker.'
+            }
+            Write-Host 'Web server and homepage smoke tests passed.'
+          } finally {
+            Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+          }
+      - name: Upload self-contained Web preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: PrefabScan-Web-Preview-win-x64
+          path: publish/web/
+          if-no-files-found: error
