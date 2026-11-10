@@ -46,8 +46,8 @@ jobs:
               }
             }
             if (-not $ready) { throw 'Web server did not become ready.' }
-            $home = Invoke-WebRequest -Uri 'http://127.0.0.1:5000/' -TimeoutSec 10
-            if ($home.Content -notmatch 'PrefabScan') {
+            $homepage = Invoke-WebRequest -Uri 'http://127.0.0.1:5000/' -TimeoutSec 10
+            if ($homepage.Content -notmatch 'PrefabScan') {
               throw 'Web homepage did not render expected marker.'
             }
             $invalidFile = Join-Path $env:RUNNER_TEMP 'invalid.txt'
