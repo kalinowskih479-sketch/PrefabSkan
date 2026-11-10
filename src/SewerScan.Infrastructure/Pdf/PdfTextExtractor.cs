@@ -107,7 +107,7 @@ namespace SewerScan.Infrastructure.Pdf
                     {
                         candidate.RawText = string.IsNullOrWhiteSpace(candidate.RawText)
                             ? existing.Text
-                            : candidate.RawText + "\\n" + existing.Text;
+                            : candidate.RawText + "\n" + existing.Text;
                     }
                     merged[candidate.PageNumber] = candidate;
                 }
