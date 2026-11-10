@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>PrefabScan Web — analiza dokumentacji</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">P<span>·</span>S</div>
+      <div><strong>PrefabScan</strong><small>WEB · WERSJA TESTOWA</small></div>
+    </div>
+    <div class="header-meta"><span class="indicator" aria-hidden="true"></span> Lokalne przetwarzanie PDF</div>
+  </header>
+  <main class="layout">
+    <section class="intro">
+      <p class="eyebrow">ANALIZA DOKUMENTACJI SANITARNEJ</p>
+      <h1>Od rysunku do zestawienia.</h1>
+      <p>Dodaj PZT i profile kanalizacji deszczowej lub sanitarnej. PrefabScan odczyta oznaczenia studni, wpustów oraz średnice przewodów i przygotuje arkusz Excel.</p>
+    </section>
+
+    <section class="panel upload-panel" aria-labelledby="upload-heading">
+      <div class="section-head">
+        <div><p class="eyebrow">KROK 01</p><h2 id="upload-heading">Dokumentacja źródłowa</h2></div>
+        <span class="badge">PDF · maks. 10 plików</span>
+      </div>
+      <form id="upload-form">
+        <label id="dropzone" class="dropzone" for="pdf-files">
+          <span class="upload-symbol" aria-hidden="true">↥</span>
+          <strong>Przeciągnij pliki PDF lub kliknij, aby wybrać</strong>
+          <span>PZT, profile podłużne, rysunki techniczne · do 25 MB na plik</span>
+          <input id="pdf-files" type="file" accept=".pdf,application/pdf" multiple required>
+        </label>
+        <div id="files-list" class="file-list" aria-live="polite"></div>
+        <div class="upload-actions">
+          <p class="privacy">Pliki są analizowane lokalnie i usuwane z katalogu tymczasowego po zakończeniu operacji.</p>
+          <button class="primary-button" id="analyze-button" type="submit">Analizuj dokumentację <span aria-hidden="true">→</span></button>
+        </div>
+      </form>
+    </section>
+
+    <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+    <section id="results" class="results" aria-label="Wyniki analizy" hidden>
+      <div class="section-head results-head">
+        <div><p class="eyebrow">KROK 02</p><h2>Wyniki analizy</h2><p id="documents-description" class="muted"></p></div>
+        <a id="export-button" class="primary-button export-button" href="#" download>Eksportuj Excel <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="metric-row">
+        <article class="metric"><span>Studnie</span><strong id="metric-manholes">0</strong></article>
+        <article class="metric"><span>Wpusty</span><strong id="metric-inlets">0</strong></article>
+        <article class="metric"><span>Przewody</span><strong id="metric-pipes">0</strong></article>
+        <article class="metric accent"><span>Studnie do weryfikacji</span><strong id="metric-incomplete">0</strong></article>
+      </div>
+      <div id="warnings" class="warnings" hidden></div>
+      <div class="panel results-panel">
+        <div class="table-toolbar">
+          <div class="tabs" role="tablist" aria-label="Typ obiektów">
+            <button type="button" class="tab active" data-tab="manholes" role="tab" aria-selected="true">Studnie</button>
+            <button type="button" class="tab" data-tab="inlets" role="tab" aria-selected="false">Wpusty</button>
+            <button type="button" class="tab" data-tab="pipes" role="tab" aria-selected="false">Przewody</button>
+          </div>
+          <label class="search-label">Filtruj <input type="search" id="table-search" placeholder="np. KD12, DN1000"></label>
+        </div>
+        <div class="table-wrap"><table><thead id="table-head"></thead><tbody id="table-body"></tbody></table></div>
+        <div class="table-footer"><span id="row-count">0 pozycji</span><span class="muted">Pola bez potwierdzenia pozostają puste.</span></div>
+      </div>
+    </section>
+    <footer>PrefabScan Web · Wersja lokalna · Wynik automatycznej analizy wymaga sprawdzenia z dokumentacją projektową.</footer>
+  </main>
+</body>
+</html>
