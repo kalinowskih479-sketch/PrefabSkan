@@ -48,7 +48,10 @@ namespace SewerScan.Infrastructure.Pdf
 
             // The OCR engine currently processes the complete PDF. Only use its output
             // for pages where both text engines failed or returned no engineering data.
-            var ocrPages = OcrFallbackExtractor.Extract(filePath, out var ocrFailure);
+            // Skip OCR for pages that have already yielded reliable text.
+            // If both text engines failed completely, OCR the whole document.
+            var pagesForOcr = merged.Count == 0 ? null : GetPagesRequiringOcr(merged);
+            var ocrPages = OcrFallbackExtractor.Extract(filePath, out var ocrFailure, pagesForOcr);
             merged = MergePreferredPages(merged, ocrPages);
             if (merged.Count > 0)
             {
@@ -74,6 +77,13 @@ namespace SewerScan.Infrastructure.Pdf
 
         internal static bool AllPagesUseful(IReadOnlyList<PageText> pages) =>
             pages.Count > 0 && pages.All(IsPageUseful);
+
+        internal static int[] GetPagesRequiringOcr(IReadOnlyList<PageText> pages) =>
+            pages.Where(page => !IsPageUseful(page))
+                .Select(page => page.PageNumber)
+                .Distinct()
+                .OrderBy(number => number)
+                .ToArray();
 
         internal static List<PageText> MergePreferredPages(
             IReadOnlyList<PageText> preferred, IReadOnlyList<PageText> fallback)
