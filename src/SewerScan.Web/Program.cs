@@ -7,7 +7,21 @@ using SewerScan.Infrastructure.Parsers;
 using SewerScan.Infrastructure.Pdf;
 using SewerScan.Web;
 
-var builder = WebApplication.CreateBuilder(args);
+// In a published app the working directory can differ from the executable
+// directory (for example when Windows starts it from a shortcut). Always
+// resolve the actual folder containing wwwroot, both in dev and publish.
+var contentRoot = new[]
+{
+    AppContext.BaseDirectory,
+    Directory.GetCurrentDirectory(),
+    Path.Combine(Directory.GetCurrentDirectory(), "src", "SewerScan.Web")
+}.FirstOrDefault(root => File.Exists(Path.Combine(root, "wwwroot", "index.html")))
+    ?? Directory.GetCurrentDirectory();
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = contentRoot
+});
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 90L * 1024 * 1024;
