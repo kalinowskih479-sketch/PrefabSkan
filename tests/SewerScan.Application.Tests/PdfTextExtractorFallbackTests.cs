@@ -141,4 +141,31 @@ public class PdfTextExtractorFallbackTests
         Assert.Single(result);
         Assert.Equal(1, result[0].PageNumber);
     }
+
+    [Fact]
+    public void Ocr_Page_Selection_Only_Includes_Unreadable_Or_Sparse_Profile_Pages()
+    {
+        var pages = new[]
+        {
+            new PageText { PageNumber = 4, Text = "PROFILE KANALIZACJI DESZCZOWEJ" },
+            new PageText { PageNumber = 1, Text = "KD1 DN1000" },
+            new PageText { PageNumber = 3, Text = "" },
+            new PageText { PageNumber = 2, Text = "PROJEKT TECHNICZNY DROGI I UZBROJENIA TERENU" }
+        };
+
+        Assert.Equal(new[] { 3, 4 }, PdfTextExtractor.GetPagesRequiringOcr(pages));
+    }
+
+    [Fact]
+    public void Ocr_Page_Selection_Eliminates_Duplicate_Page_Numbers()
+    {
+        var pages = new[]
+        {
+            new PageText { PageNumber = 2, Text = "" },
+            new PageText { PageNumber = 2, Text = "" },
+            new PageText { PageNumber = 1, Text = "KS1 DN1200" }
+        };
+
+        Assert.Equal(new[] { 2 }, PdfTextExtractor.GetPagesRequiringOcr(pages));
+    }
 }
