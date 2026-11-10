@@ -62,13 +62,21 @@ internal static class OcrFallbackExtractor
 
     private sealed record OcrWord(string Text, double X, double Y, double Width, double Height, float Confidence, int Rotation);
 
-    public static List<PageText> Extract(string filePath, out string? failure)
+    public static List<PageText> Extract(string filePath, out string? failure, IReadOnlyCollection<int>? requestedPages = null)
     {
         failure = null;
         try
         {
+            // OCR is expensive for large construction drawings. In a mixed PDF,
+            // render only pages with no useful vector/text layer.
+            var selectedPages = requestedPages == null
+                ? null
+                : new HashSet<int>(requestedPages.Where(number => number > 0));
+
             if (TryLoadCache(filePath, out var cached))
-                return cached;
+                return selectedPages == null
+                    ? cached
+                    : cached.Where(page => selectedPages.Contains(page.PageNumber)).ToList();
 
             var tessdata = OcrModelStore.Resolve(AppContext.BaseDirectory);
             const string languages = "pol+eng";
@@ -82,6 +90,9 @@ internal static class OcrFallbackExtractor
 
             for (var pageIndex = 0; pageIndex < docReader.GetPageCount(); pageIndex++)
             {
+                if (selectedPages != null && !selectedPages.Contains(pageIndex + 1))
+                    continue;
+
                 using var reader = docReader.GetPageReader(pageIndex);
                 var width = reader.GetPageWidth();
                 var height = reader.GetPageHeight();
@@ -139,7 +150,9 @@ internal static class OcrFallbackExtractor
                 pages.Add(pt);
             }
 
-            if (pages.Any(p => p.Items.Count > 0 || !string.IsNullOrWhiteSpace(p.Text)))
+            // This cache identity represents a complete PDF. Do not store a page
+            // subset under the full-document cache key.
+            if (selectedPages == null && pages.Any(p => p.Items.Count > 0 || !string.IsNullOrWhiteSpace(p.Text)))
                 SaveCache(filePath, pages);
 
             return pages;
