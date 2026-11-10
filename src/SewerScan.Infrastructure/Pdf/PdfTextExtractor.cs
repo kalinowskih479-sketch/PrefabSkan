@@ -124,7 +124,8 @@ namespace SewerScan.Infrastructure.Pdf
             {
                 var text = page.Text ?? string.Empty;
                 return Regex.IsMatch(text, @"\bPROFIL(?:E|U|OM)?\b", RegexOptions.IgnoreCase) &&
-                       Regex.IsMatch(text, @"\bKANALIZACJ", RegexOptions.IgnoreCase);
+                       (Regex.IsMatch(text, @"\bKANALIZACJ", RegexOptions.IgnoreCase) ||
+                        Regex.IsMatch(text, @"\bPOD[ŁL]U[ŻZ]N", RegexOptions.IgnoreCase));
             });
             var hasProfileEngineeringCandidate = pages.Any(page =>
                 ProfileEngineeringCandidateRegex.IsMatch(page.Text ?? string.Empty));
