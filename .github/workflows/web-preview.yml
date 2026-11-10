@@ -32,7 +32,9 @@ jobs:
       - name: Smoke-test localhost web server
         shell: pwsh
         run: |
-          $server = Start-Process -FilePath 'publish/web/SewerScan.Web.exe' -PassThru
+          $webDir = (Resolve-Path 'publish/web').Path
+          $webExe = Join-Path $webDir 'SewerScan.Web.exe'
+          $server = Start-Process -FilePath $webExe -WorkingDirectory $webDir -PassThru
           try {
             $ready = $false
             for ($i = 0; $i -lt 30; $i++) {
@@ -48,7 +50,13 @@ jobs:
             if ($home.Content -notmatch 'PrefabScan') {
               throw 'Web homepage did not render expected marker.'
             }
-            Write-Host 'Web server and homepage smoke tests passed.'
+            $invalidFile = Join-Path $env:RUNNER_TEMP 'invalid.txt'
+            Set-Content -LiteralPath $invalidFile -Value 'not a PDF'
+            $invalid = Invoke-WebRequest -Uri 'http://127.0.0.1:5000/api/analyze' -Method Post -Headers @{ 'X-PrefabScan-Client' = 'web' } -Form @{ files = (Get-Item $invalidFile) } -SkipHttpErrorCheck
+            if ($invalid.StatusCode -ne 400) {
+              throw "Upload extension validation failed, HTTP $($invalid.StatusCode)."
+            }
+            Write-Host 'Web server, homepage and upload validation smoke tests passed.'
           } finally {
             Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
           }
