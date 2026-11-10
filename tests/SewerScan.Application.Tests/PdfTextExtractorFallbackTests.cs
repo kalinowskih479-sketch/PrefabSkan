@@ -1,5 +1,8 @@
+using System;
+using System.Linq;
 using SewerScan.Application.Models;
 using SewerScan.Infrastructure.Pdf;
+using SewerScan.Infrastructure.Parsers;
 using Xunit;
 
 namespace SewerScan.Application.Tests;
@@ -57,5 +60,166 @@ public class PdfTextExtractorFallbackTests
         };
 
         Assert.True(PdfTextExtractor.NeedsProfileOcrFallback(new[] { page }));
+    }
+
+    [Fact]
+    public void Mixed_Document_Requires_Fallback_When_One_Page_Is_Empty()
+    {
+        var pages = new[]
+        {
+            new PageText { PageNumber = 1, Text = "KD1 DN1000 PVC DN200" },
+            new PageText { PageNumber = 2, Text = "" }
+        };
+
+        Assert.False(PdfTextExtractor.AllPagesUseful(pages));
+    }
+
+    [Fact]
+    public void Merge_Replaces_Only_Missing_Scan_Page_And_Keeps_Page_Order()
+    {
+        var vector = new[]
+        {
+            new PageText { PageNumber = 1, Text = "KD1 DN1000" },
+            new PageText { PageNumber = 2, Text = "" }
+        };
+        var ocr = new[]
+        {
+            new PageText { PageNumber = 2, Text = "KS2 DN1200" },
+            new PageText { PageNumber = 1, Text = "OCR KD1 DN1000" }
+        };
+
+        var result = PdfTextExtractor.MergePreferredPages(vector, ocr);
+
+        Assert.Equal(new[] { 1, 2 }, result.Select(p => p.PageNumber));
+        Assert.Same(vector[0], result[0]);
+        Assert.Same(ocr[0], result[1]);
+        Assert.True(PdfTextExtractor.AllPagesUseful(result));
+    }
+
+    [Fact]
+    public void Merge_Replaces_Sparse_Profile_Title_With_Engineering_Ocr()
+    {
+        var vector = new[]
+        {
+            new PageText { PageNumber = 1, Text = "PROFILE KANALIZACJI DESZCZOWEJ" }
+        };
+        var ocr = new[]
+        {
+            new PageText { PageNumber = 1, Text = "PROFIL KANALIZACJI DESZCZOWEJ KD4 DN1000" }
+        };
+
+        var result = PdfTextExtractor.MergePreferredPages(vector, ocr);
+
+        Assert.Same(ocr[0], Assert.Single(result));
+    }
+
+    [Fact]
+    public void Merge_Keeps_Unresolved_Page_For_Diagnostics()
+    {
+        var vector = new[]
+        {
+            new PageText { PageNumber = 1, Text = "KD1 DN1000" },
+            new PageText { PageNumber = 2, Text = "" }
+        };
+
+        var result = PdfTextExtractor.MergePreferredPages(vector, Array.Empty<PageText>());
+
+        Assert.Equal(2, result.Count);
+        Assert.False(PdfTextExtractor.AllPagesUseful(result));
+    }
+
+    [Fact]
+    public void Merge_Tolerates_Duplicate_Page_Numbers_In_Extractor_Output()
+    {
+        var pages = new[]
+        {
+            new PageText { PageNumber = 1, Text = "KD1 DN1000" },
+            new PageText { PageNumber = 1, Text = "KD1 DN1000" }
+        };
+
+        var result = PdfTextExtractor.MergePreferredPages(pages, Array.Empty<PageText>());
+
+        Assert.Single(result);
+        Assert.Equal(1, result[0].PageNumber);
+    }
+
+    [Fact]
+    public void Ocr_Page_Selection_Only_Includes_Unreadable_Or_Sparse_Profile_Pages()
+    {
+        var pages = new[]
+        {
+            new PageText { PageNumber = 4, Text = "PROFILE KANALIZACJI DESZCZOWEJ" },
+            new PageText { PageNumber = 1, Text = "KD1 DN1000" },
+            new PageText { PageNumber = 3, Text = "" },
+            new PageText { PageNumber = 2, Text = "PROJEKT TECHNICZNY DROGI I UZBROJENIA TERENU" }
+        };
+
+        Assert.Equal(new[] { 3, 4 }, PdfTextExtractor.GetPagesRequiringOcr(pages));
+    }
+
+    [Fact]
+    public void Ocr_Page_Selection_Eliminates_Duplicate_Page_Numbers()
+    {
+        var pages = new[]
+        {
+            new PageText { PageNumber = 2, Text = "" },
+            new PageText { PageNumber = 2, Text = "" },
+            new PageText { PageNumber = 1, Text = "KS1 DN1200" }
+        };
+
+        Assert.Equal(new[] { 2 }, PdfTextExtractor.GetPagesRequiringOcr(pages));
+    }
+
+    [Fact]
+    public async System.Threading.Tasks.Task Ocr_Replacement_Preserves_Vector_Title_For_Drawing_Type_Detection()
+    {
+        var title = new PageText
+        {
+            PageNumber = 1,
+            Text = "PROFILE PODŁUŻNE SIECI KANALIZACJI DESZCZOWEJ"
+        };
+        var ocr = new PageText
+        {
+            PageNumber = 1,
+            Text = "KD4 DN1000",
+            RawText = "KD4 DN1000",
+            OrderedText = "KD4 DN1000",
+            ExtractionEngine = "OCR/Tesseract tiled"
+        };
+
+        var pages = PdfTextExtractor.MergePreferredPages(new[] { title }, new[] { ocr });
+        var merged = Assert.Single(pages);
+        Assert.Same(ocr, merged);
+        Assert.Contains(title.Text, merged.RawText);
+        Assert.Equal("KD4 DN1000", merged.Text);
+
+        var parsed = await new SewerProjectParser().ParseAsync(pages);
+        Assert.Equal("PROFIL", parsed.DrawingType);
+    }
+
+    [Fact]
+    public void Sparse_Longitudinal_Profile_Title_Without_Kanalizacja_Also_Requires_Ocr()
+    {
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "PROFIL PODŁUŻNY SIECI DESZCZOWEJ"
+        };
+
+        Assert.True(PdfTextExtractor.NeedsProfileOcrFallback(new[] { page }));
+        Assert.Equal(new[] { 1 }, PdfTextExtractor.GetPagesRequiringOcr(new[] { page }));
+    }
+
+    [Fact]
+    public void Longitudinal_Profile_With_Node_And_Diameter_Does_Not_Require_Ocr()
+    {
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "PROFIL PODŁUŻNY SIECI DESZCZOWEJ D3 DN1000"
+        };
+
+        Assert.False(PdfTextExtractor.NeedsProfileOcrFallback(new[] { page }));
+        Assert.Empty(PdfTextExtractor.GetPagesRequiringOcr(new[] { page }));
     }
 }

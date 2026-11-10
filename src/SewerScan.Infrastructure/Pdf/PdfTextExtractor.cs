@@ -36,70 +36,89 @@ namespace SewerScan.Infrastructure.Pdf
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
             var pigPages = TryExtractWithPdfPig(filePath, out var pigFailure);
-            var pigUseful = pigPages.Count > 0 && pigPages.Any(IsUseful);
-            var pigNeedsProfileOcr = NeedsProfileOcrFallback(pigPages);
-
-            if (pigUseful && !pigNeedsProfileOcr)
+            // If PdfPig threw mid-document it may have returned only the first few
+            // pages. Do not treat that partial list as the whole PDF.
+            if (pigFailure == null && AllPagesUseful(pigPages))
                 return Task.FromResult((IReadOnlyList<PageText>)pigPages);
 
-            Debug.WriteLine($"[PdfTextExtractor] PdfPig returned no useful text for '{filePath}'. Trying PDFium/Docnet.");
-
+            // A mixed PDF can have selectable text on one page and a raster scan on another.
+            // Evaluate each page independently; Any(IsUseful) would silently skip scans.
             var pdfiumPages = TryExtractWithPdfium(filePath, out var pdfiumFailure);
-            var pdfiumUseful = pdfiumPages.Count > 0 && pdfiumPages.Any(IsUseful);
-            var pdfiumNeedsProfileOcr = NeedsProfileOcrFallback(pdfiumPages);
+            var merged = MergePreferredPages(pigPages, pdfiumPages);
+            if (pdfiumFailure == null && AllPagesUseful(merged))
+                return Task.FromResult((IReadOnlyList<PageText>)merged);
 
-            if (pdfiumUseful && !pdfiumNeedsProfileOcr)
+            // The OCR engine currently processes the complete PDF. Only use its output
+            // for pages where both text engines failed or returned no engineering data.
+            // Skip OCR for pages that have already yielded reliable text.
+            // If both text engines failed completely, OCR the whole document.
+            // When both text engines stopped with an error, their page inventory
+            // can be incomplete. Full OCR ensures no page is silently omitted.
+            var pagesForOcr = merged.Count == 0 || (pigFailure != null && pdfiumFailure != null)
+                ? null
+                : GetPagesRequiringOcr(merged);
+            var ocrPages = OcrFallbackExtractor.Extract(filePath, out var ocrFailure, pagesForOcr);
+            merged = MergePreferredPages(merged, ocrPages);
+            if (merged.Count > 0)
             {
-                // Preserve the fact that PdfPig failed/was empty in every page diagnostic.
-                foreach (var page in pdfiumPages)
+                foreach (var page in merged.Where(page => !IsPageUseful(page)))
                 {
                     page.ExtractionDiagnostics =
-                        "FALLBACK: PdfPig nie zwrócił użytecznej warstwy tekstowej. Użyto PDFium/Docnet.\r\n" +
-                        (string.IsNullOrWhiteSpace(pigFailure) ? string.Empty : $"PdfPig: {pigFailure}\r\n") +
-                        page.ExtractionDiagnostics;
-                }
-                return Task.FromResult((IReadOnlyList<PageText>)pdfiumPages);
-            }
-
-            // Engine 3: OCR. This is intentionally used only when both text engines report
-            // an empty layer. Engineering drawings are rendered through PDFium and OCR is run
-            // on overlapping tiles, preserving word coordinates for the spatial parser.
-            Debug.WriteLine($"[PdfTextExtractor] Text engines empty for '{filePath}'. Starting tiled OCR fallback.");
-            var ocrPages = OcrFallbackExtractor.Extract(filePath, out var ocrFailure);
-            var ocrUseful = ocrPages.Count > 0 && ocrPages.Any(IsUseful);
-            if (ocrUseful)
-            {
-                foreach (var page in ocrPages)
-                {
-                    page.ExtractionDiagnostics =
-                        "FALLBACK_3: PdfPig i PDFium nie znalazły tekstu. Uruchomiono OCR kafelkowy.\r\n" +
-                        (string.IsNullOrWhiteSpace(pigFailure) ? string.Empty : $"PdfPig: {pigFailure}\r\n") +
-                        (string.IsNullOrWhiteSpace(pdfiumFailure) ? string.Empty : $"PDFium: {pdfiumFailure}\r\n") +
-                        page.ExtractionDiagnostics;
-                }
-                return Task.FromResult((IReadOnlyList<PageText>)ocrPages);
-            }
-
-            // All three engines failed. Return diagnostics instead of pretending the parser
-            // can analyse an empty document.
-            var diagnosticPages = pdfiumPages.Count > 0 ? pdfiumPages : pigPages;
-            if (diagnosticPages.Count > 0)
-            {
-                foreach (var page in diagnosticPages)
-                {
-                    page.ExtractionDiagnostics =
-                        "OCR_FAILED: PdfPig, PDFium i OCR nie znalazły użytecznych danych.\r\n" +
+                        "OCR_FAILED: Brak użytecznych danych na tej stronie.\r\n" +
                         (string.IsNullOrWhiteSpace(pigFailure) ? string.Empty : $"PdfPig: {pigFailure}\r\n") +
                         (string.IsNullOrWhiteSpace(pdfiumFailure) ? string.Empty : $"PDFium: {pdfiumFailure}\r\n") +
                         (string.IsNullOrWhiteSpace(ocrFailure) ? string.Empty : $"OCR: {ocrFailure}\r\n") +
                         page.ExtractionDiagnostics;
                 }
-                return Task.FromResult((IReadOnlyList<PageText>)diagnosticPages);
+                return Task.FromResult((IReadOnlyList<PageText>)merged);
             }
 
             throw new System.IO.InvalidDataException(
                 $"Nie można odczytać pliku PDF '{System.IO.Path.GetFileName(filePath)}' żadnym silnikiem. " +
                 $"PdfPig: {pigFailure ?? "brak danych"}. PDFium: {pdfiumFailure ?? "brak danych"}. OCR: {ocrFailure ?? "brak danych"}.");
+        }
+
+        private static bool IsPageUseful(PageText page) =>
+            IsUseful(page) && !NeedsProfileOcrFallback(new[] { page });
+
+        internal static bool AllPagesUseful(IReadOnlyList<PageText> pages) =>
+            pages.Count > 0 && pages.All(IsPageUseful);
+
+        internal static int[] GetPagesRequiringOcr(IReadOnlyList<PageText> pages) =>
+            pages.Where(page => !IsPageUseful(page))
+                .Select(page => page.PageNumber)
+                .Distinct()
+                .OrderBy(number => number)
+                .ToArray();
+
+        internal static List<PageText> MergePreferredPages(
+            IReadOnlyList<PageText> preferred, IReadOnlyList<PageText> fallback)
+        {
+            var merged = preferred.GroupBy(page => page.PageNumber)
+                .ToDictionary(group => group.Key, group => group.First());
+            foreach (var candidate in fallback)
+            {
+                if (!merged.TryGetValue(candidate.PageNumber, out var existing))
+                {
+                    merged[candidate.PageNumber] = candidate;
+                }
+                else if (!IsPageUseful(existing) && IsPageUseful(candidate))
+                {
+                    // A sparse vector title can be the only reliable indicator that
+                    // this page is a longitudinal profile. Preserve that context when
+                    // the OCR/PDFium replacement has the useful pipe geometry.
+                    if (NeedsProfileOcrFallback(new[] { existing }) &&
+                        !string.IsNullOrWhiteSpace(existing.Text) &&
+                        !candidate.RawText.Contains(existing.Text, StringComparison.Ordinal))
+                    {
+                        candidate.RawText = string.IsNullOrWhiteSpace(candidate.RawText)
+                            ? existing.Text
+                            : candidate.RawText + "\n" + existing.Text;
+                    }
+                    merged[candidate.PageNumber] = candidate;
+                }
+            }
+            return merged.Values.OrderBy(page => page.PageNumber).ToList();
         }
 
         internal static bool NeedsProfileOcrFallback(IReadOnlyList<PageText> pages)
@@ -111,7 +130,8 @@ namespace SewerScan.Infrastructure.Pdf
             {
                 var text = page.Text ?? string.Empty;
                 return Regex.IsMatch(text, @"\bPROFIL(?:E|U|OM)?\b", RegexOptions.IgnoreCase) &&
-                       Regex.IsMatch(text, @"\bKANALIZACJ", RegexOptions.IgnoreCase);
+                       (Regex.IsMatch(text, @"\bKANALIZACJ", RegexOptions.IgnoreCase) ||
+                        Regex.IsMatch(text, @"\bPOD[ŁL]U[ŻZ]N", RegexOptions.IgnoreCase));
             });
             var hasProfileEngineeringCandidate = pages.Any(page =>
                 ProfileEngineeringCandidateRegex.IsMatch(page.Text ?? string.Empty));
