@@ -196,4 +196,30 @@ public class PdfTextExtractorFallbackTests
         var parsed = await new SewerProjectParser().ParseAsync(pages);
         Assert.Equal("PROFIL", parsed.DrawingType);
     }
+
+    [Fact]
+    public void Sparse_Longitudinal_Profile_Title_Without_Kanalizacja_Also_Requires_Ocr()
+    {
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "PROFIL PODŁUŻNY SIECI DESZCZOWEJ"
+        };
+
+        Assert.True(PdfTextExtractor.NeedsProfileOcrFallback(new[] { page }));
+        Assert.Equal(new[] { 1 }, PdfTextExtractor.GetPagesRequiringOcr(new[] { page }));
+    }
+
+    [Fact]
+    public void Longitudinal_Profile_With_Node_And_Diameter_Does_Not_Require_Ocr()
+    {
+        var page = new PageText
+        {
+            PageNumber = 1,
+            Text = "PROFIL PODŁUŻNY SIECI DESZCZOWEJ D3 DN1000"
+        };
+
+        Assert.False(PdfTextExtractor.NeedsProfileOcrFallback(new[] { page }));
+        Assert.Empty(PdfTextExtractor.GetPagesRequiringOcr(new[] { page }));
+    }
 }
