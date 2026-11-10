@@ -73,7 +73,8 @@ internal static class OcrFallbackExtractor
                 ? null
                 : new HashSet<int>(requestedPages.Where(number => number > 0));
 
-            if (TryLoadCache(filePath, out var cached))
+            var cachePath = GetCachePath(filePath);
+            if (TryLoadCache(cachePath, out var cached))
                 return selectedPages == null
                     ? cached
                     : cached.Where(page => selectedPages.Contains(page.PageNumber)).ToList();
@@ -143,7 +144,7 @@ internal static class OcrFallbackExtractor
                         $"Silnik: OCR/Tesseract tiled; języki: {languages}\r\n" +
                         $"Render: {width}x{height}px; skala OCR: {ocrScale:0.00}x; kafle: {tileCount}; przebiegi orientacji: {rotationPasses}\r\n" +
                         $"OCR słowa: {deduped.Count}; kandydaci techniczni: {candidates}; średnia pewność: {avgConfidence:0.0}\r\n" +
-                        $"Cache: {GetCachePath(filePath)}\r\n" +
+                        $"Cache: {cachePath}\r\n" +
                         $"Pierwsze tokeny: {string.Join(" | ", deduped.Take(100).Select(w => w.Text))}"
                 };
                 pt.Items.AddRange(items);
@@ -153,7 +154,7 @@ internal static class OcrFallbackExtractor
             // This cache identity represents a complete PDF. Do not store a page
             // subset under the full-document cache key.
             if (selectedPages == null && pages.Any(p => p.Items.Count > 0 || !string.IsNullOrWhiteSpace(p.Text)))
-                SaveCache(filePath, pages);
+                SaveCache(cachePath, pages);
 
             return pages;
         }
@@ -556,14 +557,13 @@ internal static class OcrFallbackExtractor
         return OcrCacheIdentity.CreatePath(cacheRoot, hash);
     }
 
-    private static bool TryLoadCache(string filePath, out List<PageText> pages)
+    private static bool TryLoadCache(string cachePath, out List<PageText> pages)
     {
         pages = new List<PageText>();
         try
         {
-            var path = GetCachePath(filePath);
-            if (!File.Exists(path)) return false;
-            var doc = JsonSerializer.Deserialize<CacheDocument>(File.ReadAllText(path));
+            if (!File.Exists(cachePath)) return false;
+            var doc = JsonSerializer.Deserialize<CacheDocument>(File.ReadAllText(cachePath));
             if (doc == null || doc.Version != OcrCacheIdentity.Identity || doc.Pages.Count == 0) return false;
             pages = doc.Pages.Select(p =>
             {
@@ -584,7 +584,7 @@ internal static class OcrFallbackExtractor
         catch { return false; }
     }
 
-    private static void SaveCache(string filePath, IReadOnlyList<PageText> pages)
+    private static void SaveCache(string cachePath, IReadOnlyList<PageText> pages)
     {
         try
         {
@@ -598,7 +598,7 @@ internal static class OcrFallbackExtractor
                     Items = p.Items.Select(i => new CacheItem { Text = i.Text, X = i.X, Y = i.Y, Width = i.Width, Height = i.Height }).ToList()
                 }).ToList()
             };
-            File.WriteAllText(GetCachePath(filePath), JsonSerializer.Serialize(doc));
+            File.WriteAllText(cachePath, JsonSerializer.Serialize(doc));
         }
         catch (Exception ex) { Debug.WriteLine($"OCR cache save failed: {ex.Message}"); }
     }
