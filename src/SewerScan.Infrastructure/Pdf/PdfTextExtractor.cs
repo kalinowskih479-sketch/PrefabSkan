@@ -92,9 +92,23 @@ namespace SewerScan.Infrastructure.Pdf
                 .ToDictionary(group => group.Key, group => group.First());
             foreach (var candidate in fallback)
             {
-                if (!merged.TryGetValue(candidate.PageNumber, out var existing) ||
-                    (!IsPageUseful(existing) && IsPageUseful(candidate)))
+                if (!merged.TryGetValue(candidate.PageNumber, out var existing))
                 {
+                    merged[candidate.PageNumber] = candidate;
+                }
+                else if (!IsPageUseful(existing) && IsPageUseful(candidate))
+                {
+                    // A sparse vector title can be the only reliable indicator that
+                    // this page is a longitudinal profile. Preserve that context when
+                    // the OCR/PDFium replacement has the useful pipe geometry.
+                    if (NeedsProfileOcrFallback(new[] { existing }) &&
+                        !string.IsNullOrWhiteSpace(existing.Text) &&
+                        !candidate.RawText.Contains(existing.Text, StringComparison.Ordinal))
+                    {
+                        candidate.RawText = string.IsNullOrWhiteSpace(candidate.RawText)
+                            ? existing.Text
+                            : candidate.RawText + "\\n" + existing.Text;
+                    }
                     merged[candidate.PageNumber] = candidate;
                 }
             }
